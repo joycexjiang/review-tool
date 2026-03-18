@@ -3,14 +3,18 @@
 import { createMockNotes } from "@/mock/comments";
 import { deploys } from "@/mock/deploys";
 import type { InspectorAction, InspectorState } from "./types";
-import { initialFilters, initialInspectorState } from "./types";
+import {
+	initialFilters,
+	initialInspectorState,
+	isPanelOpen,
+} from "./types";
 
 export function createInitialInspectorState(): InspectorState {
 	return {
 		...initialInspectorState,
 		notes: createMockNotes(),
 		deploys,
-		activeDeploy: "v2",
+		activeDeploy: "v1",
 	};
 }
 
@@ -20,25 +24,32 @@ export function inspectorReducer(
 ): InspectorState {
 	switch (action.type) {
 		case "TOGGLE_INSPECT_MODE":
-			if (state.inspectMode) {
+			if (state.inspection.type === "idle") {
 				return {
 					...state,
-					inspectMode: false,
-					selectedElement: null,
-					popoverOpen: false,
+					inspection: { type: "armed" },
 				};
 			}
-			return { ...state, inspectMode: true };
 
-		case "SELECT_ELEMENT":
 			return {
 				...state,
-				selectedElement: action.payload,
-				popoverOpen: !!action.payload,
+				inspection: { type: "idle" },
+			};
+
+		case "SELECT_ELEMENT":
+			if (!action.payload) {
+				return {
+					...state,
+					inspection: { type: "armed" },
+				};
+			}
+			return {
+				...state,
+				inspection: { type: "selected", element: action.payload },
 			};
 
 		case "CLOSE_POPOVER":
-			return { ...state, selectedElement: null, popoverOpen: false };
+			return { ...state, inspection: { type: "armed" } };
 
 		case "ADD_NOTE":
 			return {
@@ -63,13 +74,72 @@ export function inspectorReducer(
 		}
 
 		case "TOGGLE_PANEL":
-			return { ...state, panelOpen: !state.panelOpen };
+			switch (state.reviewPopover.type) {
+				case "closed-floating":
+					return {
+						...state,
+						reviewPopover: { type: "open-floating" },
+					};
+				case "open-floating":
+					return {
+						...state,
+						reviewPopover: { type: "closed-floating" },
+					};
+				case "closed-drawer":
+					return {
+						...state,
+						reviewPopover: { type: "open-drawer", isResizing: false },
+					};
+				case "open-drawer":
+					return {
+						...state,
+						reviewPopover: { type: "closed-drawer" },
+					};
+			}
+			return state;
+
+		case "TOGGLE_PANEL_MODE":
+			switch (state.reviewPopover.type) {
+				case "closed-floating":
+					return {
+						...state,
+						reviewPopover: { type: "closed-drawer" },
+					};
+				case "open-floating":
+					return {
+						...state,
+						reviewPopover: { type: "open-drawer", isResizing: false },
+						toolbarSide: "left",
+					};
+				case "closed-drawer":
+					return {
+						...state,
+						reviewPopover: { type: "closed-floating" },
+					};
+				case "open-drawer":
+					return {
+						...state,
+						reviewPopover: { type: "open-floating" },
+					};
+			}
+			return state;
 
 		case "ANNOUNCE":
-			return { ...state, announcement: action.payload };
+			return {
+				...state,
+				announcement: action.payload,
+			};
 
 		case "SCROLL_TO_NOTE":
-			return { ...state, panelOpen: true, highlightedNoteId: action.payload };
+			return {
+				...state,
+				reviewPopover: isPanelOpen(state.reviewPopover)
+					? state.reviewPopover
+					: state.reviewPopover.type === "closed-drawer"
+						? { type: "open-drawer", isResizing: false }
+						: { type: "open-floating" },
+				highlightedNoteId: action.payload,
+			};
 
 		case "SET_ACTIVE_NOTE":
 			return { ...state, activeNoteId: action.payload };
@@ -93,11 +163,30 @@ export function inspectorReducer(
 			};
 		}
 
+		case "SET_DRAWER_WIDTH":
+			return { ...state, drawerWidth: action.payload };
+
+		case "SET_DRAWER_RESIZING":
+			if (state.reviewPopover.type !== "open-drawer") {
+				return state;
+			}
+
+			return {
+				...state,
+				reviewPopover: {
+					type: "open-drawer",
+					isResizing: action.payload,
+				},
+			};
+
 		case "SET_TOOLBAR_SIDE":
 			return { ...state, toolbarSide: action.payload };
 
 		case "SET_TOOLBAR_WIDTH":
 			return { ...state, toolbarWidth: action.payload };
+
+		case "SET_TOOLBAR_HEIGHT":
+			return { ...state, toolbarHeight: action.payload };
 
 		case "SET_TOOLBAR_Y":
 			return { ...state, toolbarY: action.payload };

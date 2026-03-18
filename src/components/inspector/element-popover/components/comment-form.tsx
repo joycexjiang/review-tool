@@ -36,7 +36,7 @@ export default function CommentForm({ onSubmit }: CommentFormProps) {
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!text.trim()) return;
+		if (!text.trim()) {return;}
 		onSubmit(text.trim(), type, severity);
 		setText("");
 	};

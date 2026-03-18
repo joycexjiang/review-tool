@@ -1,4 +1,4 @@
-import type { Deploy } from "@/types";
+import type { Deploy, DeployVersion } from "@/types";
 
 export const deploys: Deploy[] = [
 	{
@@ -17,14 +17,18 @@ export const deploys: Deploy[] = [
 	},
 ];
 
-export const DEPLOY_ORDER = ["v1", "v2"] as const;
+export const DEPLOY_ORDER: readonly DeployVersion[] = ["v1", "v2"];
+
+const DEPLOY_RANK: Record<DeployVersion, number> = {
+	v1: 0,
+	v2: 1,
+};
 
 export function isDeployAtOrBefore(
-	deploy: string,
-	reference: string,
+	deploy: DeployVersion,
+	reference: DeployVersion,
 ): boolean {
-	return DEPLOY_ORDER.indexOf(deploy as "v1" | "v2") <=
-		DEPLOY_ORDER.indexOf(reference as "v1" | "v2");
+	return DEPLOY_RANK[deploy] <= DEPLOY_RANK[reference];
 }
 
 export function getActiveDeploy(): Deploy {

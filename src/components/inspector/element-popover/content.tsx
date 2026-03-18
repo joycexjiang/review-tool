@@ -140,7 +140,7 @@ export default function ElementPopoverContent({
 											copied={sourceCopied}
 											onCopy={onCopySource}
 											copyLabel="Copy source"
-											copiedLabel="Copied!"
+											copiedLabel="Copied"
 											ariaLabel="Copy source file"
 											codeClassName="text-sourcefile"
 										/>
@@ -176,7 +176,7 @@ export default function ElementPopoverContent({
 										copied={selectorCopied}
 										onCopy={onCopySelector}
 										copyLabel="Copy selector"
-										copiedLabel="Copied!"
+										copiedLabel="Copied"
 										ariaLabel="Copy CSS selector"
 									/>
 
@@ -187,7 +187,7 @@ export default function ElementPopoverContent({
 											copied={sourceCopied}
 											onCopy={onCopySource}
 											copyLabel="Copy source"
-											copiedLabel="Copied!"
+											copiedLabel="Copied"
 											ariaLabel="Copy source file"
 											codeClassName="text-sourcefile"
 										/>

@@ -2,12 +2,13 @@
 
 import { useCallback } from "react";
 import {
-	SEVERITY_LABELS,
-	SeverityTicks,
-} from "@/components/comments/severity-scale";
+	CommentSeverityBadge,
+	CommentSourceCode,
+} from "@/components/comments/comment-meta";
+import { useElementHighlightOverlay } from "@/components/inspector/hooks/use-element-highlight-overlay";
 import { useInspectorActions } from "@/components/inspector/state/provider";
-import { useElementHighlightOverlay } from "@/hooks/use-element-highlight-overlay";
 import { cn } from "@/lib/utils";
+import type { CommentType } from "@/types";
 import { NUMBER_BADGE_CLASS } from "@/ui/number-badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import type { BadgeEntry } from "./types";
@@ -16,7 +17,7 @@ const TYPE_LABELS = {
 	bug: "Bug",
 	suggestion: "Suggestion",
 	question: "Question",
-} as const;
+} satisfies Record<CommentType, string>;
 
 export default function NumberBadgeHoverComment({
 	entry,
@@ -52,10 +53,6 @@ export default function NumberBadgeHoverComment({
 			showHighlight,
 		],
 	);
-
-	const sourceLocation = entry.note.elementInfo.sourceFile
-		? `${entry.note.elementInfo.sourceFile}${entry.note.elementInfo.sourceLine ? `:${entry.note.elementInfo.sourceLine}` : ""}`
-		: entry.note.elementInfo.cssSelector;
 
 	return (
 		<Popover onOpenChange={handleOpenChange}>
@@ -101,12 +98,11 @@ export default function NumberBadgeHoverComment({
 							>
 								{TYPE_LABELS[entry.note.type]}
 							</span>
-							<div className={cn("inline-flex items-center")}>
-								<SeverityTicks severity={entry.note.severity} />
-								<span className="sr-only">
-									{SEVERITY_LABELS[entry.note.severity]}
-								</span>
-							</div>
+							<CommentSeverityBadge
+								severity={entry.note.severity}
+								className="text-zinc-600"
+								iconClassName="size-4"
+							/>
 						</div>
 						{entry.note.resolved ? (
 							<span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 ring-1 ring-emerald-200 ring-inset">
@@ -141,9 +137,10 @@ export default function NumberBadgeHoverComment({
 						<div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-zinc-400">
 							Source file
 						</div>
-						<code className="block truncate rounded-md bg-zinc-50 px-2 py-1 font-mono text-[11px] text-zinc-600 ring-1 ring-zinc-200">
-							{sourceLocation}
-						</code>
+						<CommentSourceCode
+							source={entry.note.elementInfo}
+							className="w-full px-2 py-1 text-zinc-600"
+						/>
 					</div>
 				</article>
 			</PopoverContent>

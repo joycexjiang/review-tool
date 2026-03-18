@@ -45,18 +45,18 @@ const RAIL_BAR_INDEXES = Array.from(
 );
 
 function getRailBarHeight(distance: number, isPreviewing: boolean) {
-	if (distance === 0) return isPreviewing ? 26 : 23;
-	if (distance === 1) return isPreviewing ? 20 : 17;
-	if (distance === 2) return isPreviewing ? 15 : 13;
-	if (distance === 3) return 11;
+	if (distance === 0) {return isPreviewing ? 26 : 23;}
+	if (distance === 1) {return isPreviewing ? 20 : 17;}
+	if (distance === 2) {return isPreviewing ? 15 : 13;}
+	if (distance === 3) {return 11;}
 	return 9;
 }
 
 function getRailBarOpacity(distance: number) {
-	if (distance === 0) return 1;
-	if (distance === 1) return 0.86;
-	if (distance === 2) return 0.68;
-	if (distance === 3) return 0.48;
+	if (distance === 0) {return 1;}
+	if (distance === 1) {return 0.86;}
+	if (distance === 2) {return 0.68;}
+	if (distance === 3) {return 0.48;}
 	return 0.34;
 }
 

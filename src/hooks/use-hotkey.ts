@@ -38,12 +38,16 @@ export function useHotkey(
 		() => window,
 		"keydown",
 		(event) => {
-			const keyboardEvent = event as KeyboardEvent;
-			if (keyboardEvent.key.toLowerCase() !== normalizedKey) return;
-			if (!matchesModifier(shiftKey, keyboardEvent.shiftKey)) return;
-			if (!matchesModifier(altKey, keyboardEvent.altKey)) return;
-			if (!matchesModifier(metaKey, keyboardEvent.metaKey)) return;
-			if (!matchesModifier(ctrlKey, keyboardEvent.ctrlKey)) return;
+			if (!(event instanceof KeyboardEvent)) {
+				return;
+			}
+
+			const keyboardEvent = event;
+			if (keyboardEvent.key.toLowerCase() !== normalizedKey) {return;}
+			if (!matchesModifier(shiftKey, keyboardEvent.shiftKey)) {return;}
+			if (!matchesModifier(altKey, keyboardEvent.altKey)) {return;}
+			if (!matchesModifier(metaKey, keyboardEvent.metaKey)) {return;}
+			if (!matchesModifier(ctrlKey, keyboardEvent.ctrlKey)) {return;}
 			if (
 				metaOrCtrl !== undefined &&
 				(keyboardEvent.metaKey || keyboardEvent.ctrlKey) !== metaOrCtrl

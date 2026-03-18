@@ -17,14 +17,7 @@ interface SourceMapJSON {
 }
 
 type FiberDebugSource = { fileName?: string; lineNumber?: number };
-type FiberType = ((...args: never[]) => unknown) | string | null | undefined;
-
-interface DebugFiber {
-	type?: FiberType;
-	return?: DebugFiber | null;
-	_debugStack?: Error | null;
-	_debugSource?: FiberDebugSource | null;
-}
+type FiberRecord = Record<string, unknown>;
 
 const sourceMapCache = new Map<string, Promise<SourceMapJSON | null>>();
 
@@ -32,26 +25,64 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null;
 }
 
-function getFiberNode(el: HTMLElement): DebugFiber | null {
+function getFiberNode(el: HTMLElement): FiberRecord | null {
 	const fiberKey = Object.keys(el).find((key) =>
 		key.startsWith("__reactFiber$"),
 	);
-	if (!fiberKey) return null;
+	if (!fiberKey) {
+		return null;
+	}
 
-	const fiber = (el as unknown as Record<string, unknown>)[fiberKey];
-	return isRecord(fiber) ? (fiber as DebugFiber) : null;
+	const fiber = Reflect.get(el, fiberKey);
+	return isRecord(fiber) ? fiber : null;
 }
 
-function getFiberComponentName(fiber: DebugFiber): string | null {
-	return typeof fiber.type === "function" && fiber.type.name
-		? fiber.type.name
+function getFiberReturn(fiber: FiberRecord): FiberRecord | null {
+	const parent = fiber.return;
+	return isRecord(parent) ? parent : null;
+}
+
+function getFiberDebugSource(fiber: FiberRecord): FiberDebugSource | null {
+	const debugSource = fiber._debugSource;
+	if (!isRecord(debugSource)) {
+		return null;
+	}
+
+	const { fileName, lineNumber } = debugSource;
+	if (
+		(fileName === undefined || typeof fileName === "string") &&
+		(lineNumber === undefined || typeof lineNumber === "number")
+	) {
+		return { fileName, lineNumber };
+	}
+
+	return null;
+}
+
+function getFiberDebugStack(fiber: FiberRecord): string | null {
+	const debugStack = fiber._debugStack;
+	if (debugStack instanceof Error) {
+		return debugStack.stack ?? null;
+	}
+
+	if (isRecord(debugStack) && typeof debugStack.stack === "string") {
+		return debugStack.stack;
+	}
+
+	return null;
+}
+
+function getFiberComponentName(fiber: FiberRecord): string | null {
+	const fiberType = fiber.type;
+	return typeof fiberType === "function" && fiberType.name
+		? fiberType.name
 		: null;
 }
 
 /** Parse source file path from a Turbopack/Webpack stack trace. */
 function parseSourceFromStack(stack: string): { file: string } | null {
 	for (const line of stack.split("\n")) {
-		if (line.includes("node_modules")) continue;
+		if (line.includes("node_modules")) {continue;}
 
 		const turboMatch = line.match(/id=[^:]*?%252Fsrc%252F([^+]+)/);
 		if (turboMatch) {
@@ -64,7 +95,7 @@ function parseSourceFromStack(stack: string): { file: string } | null {
 		}
 
 		const webpackMatch = line.match(/webpack:\/\/\/\.?\/?src\/([^:?\s]+)/);
-		if (webpackMatch) return { file: `src/${webpackMatch[1]}` };
+		if (webpackMatch) {return { file: `src/${webpackMatch[1]}` };}
 	}
 
 	return null;
@@ -77,7 +108,7 @@ function decodeVLQSegment(encoded: string): number[] {
 
 	for (const ch of encoded) {
 		const digit = B64.indexOf(ch);
-		if (digit === -1) break;
+		if (digit === -1) {break;}
 
 		value += (digit & 0x1f) << shift;
 		if (digit & 0x20) {
@@ -94,7 +125,7 @@ function decodeVLQSegment(encoded: string): number[] {
 
 function fetchSourceMap(url: string): Promise<SourceMapJSON | null> {
 	const cached = sourceMapCache.get(url);
-	if (cached) return cached;
+	if (cached) {return cached;}
 
 	const promise = fetch(`${url}.map`)
 		.then((res) => (res.ok ? res.json() : null))
@@ -109,20 +140,20 @@ function lookupInBasicMap(
 	targetLine: number,
 	targetCol: number,
 ): { file: string; line: number } | null {
-	if (!map.mappings || !map.sources) return null;
+	if (!map.mappings || !map.sources) {return null;}
 
 	const lines = map.mappings.split(";");
 	let srcIdx = 0;
 	let srcLine = 0;
 
 	for (let i = 0; i < lines.length && i <= targetLine; i++) {
-		if (!lines[i]) continue;
+		if (!lines[i]) {continue;}
 
 		let genCol = 0;
 		let match: { file: string; line: number } | null = null;
 
 		for (const segment of lines[i].split(",")) {
-			if (!segment) continue;
+			if (!segment) {continue;}
 
 			const fields = decodeVLQSegment(segment);
 			if (fields.length >= 4) {
@@ -141,7 +172,7 @@ function lookupInBasicMap(
 			}
 		}
 
-		if (i === targetLine && match) return match;
+		if (i === targetLine && match) {return match;}
 	}
 
 	return null;
@@ -188,7 +219,7 @@ function normalizeSourcePath(filePath: string): string {
 
 	if (!filePath.startsWith("src/")) {
 		const sourceIndex = filePath.indexOf("src/");
-		if (sourceIndex !== -1) filePath = filePath.slice(sourceIndex);
+		if (sourceIndex !== -1) {filePath = filePath.slice(sourceIndex);}
 	}
 
 	return filePath;
@@ -200,7 +231,7 @@ export function getReactFiberSource(el: HTMLElement): {
 	componentStack: string[];
 } {
 	let fiber = getFiberNode(el);
-	if (!fiber) return { componentStack: [] };
+	if (!fiber) {return { componentStack: [] };}
 
 	let sourceFile: string | undefined;
 	let sourceLine: number | undefined;
@@ -208,7 +239,7 @@ export function getReactFiberSource(el: HTMLElement): {
 
 	while (fiber) {
 		const componentName = getFiberComponentName(fiber);
-		const debugSource = fiber._debugSource;
+		const debugSource = getFiberDebugSource(fiber);
 
 		if (debugSource?.fileName?.includes("src/")) {
 			if (!sourceFile) {
@@ -217,12 +248,12 @@ export function getReactFiberSource(el: HTMLElement): {
 				sourceLine = debugSource.lineNumber;
 			}
 
-			if (componentName) components.push(componentName);
-			fiber = fiber.return ?? null;
+			if (componentName) {components.push(componentName);}
+			fiber = getFiberReturn(fiber);
 			continue;
 		}
 
-		const stack = fiber._debugStack?.stack;
+		const stack = getFiberDebugStack(fiber);
 		if (stack) {
 			const hasUserCode =
 				stack.includes("%252Fsrc%252F") || stack.includes("/src/");
@@ -230,41 +261,35 @@ export function getReactFiberSource(el: HTMLElement): {
 			if (hasUserCode) {
 				if (!sourceFile) {
 					const parsed = parseSourceFromStack(stack);
-					if (parsed) sourceFile = parsed.file;
+					if (parsed) {sourceFile = parsed.file;}
 				}
 
-				if (componentName) components.push(componentName);
+				if (componentName) {components.push(componentName);}
 			}
 		}
 
-		fiber = fiber.return ?? null;
+		fiber = getFiberReturn(fiber);
 	}
 
 	return { sourceFile, sourceLine, componentStack: components.reverse() };
 }
 
-/** Resolve source file via Turbopack source maps, with component-name fallback. */
+/** Resolve source file via Turbopack source maps when available. */
 export async function resolveSourceAsync(
 	el: HTMLElement,
 ): Promise<{ sourceFile: string; sourceLine: number } | null> {
 	let fiber = getFiberNode(el);
-	let nearestComponent: string | undefined;
 
 	while (fiber) {
-		const componentName = getFiberComponentName(fiber);
-		if (!nearestComponent && componentName) {
-			nearestComponent = componentName;
-		}
-
-		const stack = fiber._debugStack?.stack;
+		const stack = getFiberDebugStack(fiber);
 		if (stack) {
 			for (const line of stack.split("\n")) {
-				if (line.includes("node_modules")) continue;
+				if (line.includes("node_modules")) {continue;}
 
 				const match = line.match(/\(?(https?:\/\/.+):(\d+):(\d+)\)?/);
 				if (match && !match[1].includes("node_modules")) {
 					const map = await fetchSourceMap(match[1]);
-					if (!map) continue;
+					if (!map) {continue;}
 
 					const result = lookupInSourceMap(
 						map,
@@ -282,18 +307,7 @@ export async function resolveSourceAsync(
 			}
 		}
 
-		fiber = fiber.return ?? null;
-	}
-
-	if (nearestComponent) {
-		const kebab = nearestComponent
-			.replace(/([a-z])([A-Z])/g, "$1-$2")
-			.toLowerCase();
-
-		return {
-			sourceFile: `src/components/demo/${kebab}/index.tsx`,
-			sourceLine: 1,
-		};
+		fiber = getFiberReturn(fiber);
 	}
 
 	return null;

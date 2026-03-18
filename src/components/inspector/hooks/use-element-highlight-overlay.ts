@@ -18,7 +18,8 @@ const DEFAULT_SCROLL_OPTIONS: ScrollIntoViewOptions = {
 
 function resolveElement(target: HTMLElement | string) {
 	if (typeof target === "string") {
-		return document.querySelector(target) as HTMLElement | null;
+		const element = document.querySelector(target);
+		return element instanceof HTMLElement ? element : null;
 	}
 
 	return target;
@@ -33,7 +34,10 @@ function rectsMatch(a: DOMRect, b: DOMRect) {
 	);
 }
 
-function createHighlightNode(rect: DOMRect, variant: HighlightVariant) {
+function createHighlightNode(
+	rect: DOMRect,
+	variant: HighlightVariant,
+): HTMLDivElement {
 	const overlay = document.createElement("div");
 	overlay.setAttribute("data-inspector-overlay", "");
 	overlay.style.cssText = `
@@ -72,7 +76,6 @@ function createHighlightNode(rect: DOMRect, variant: HighlightVariant) {
 
 async function waitForStableRect(element: HTMLElement, timeoutMs = 800) {
 	return new Promise<DOMRect>((resolve) => {
-		let frameId = 0;
 		let stableFrames = 0;
 		let lastRect = element.getBoundingClientRect();
 		const start = performance.now();
@@ -87,13 +90,10 @@ async function waitForStableRect(element: HTMLElement, timeoutMs = 800) {
 				return;
 			}
 
-			frameId = requestAnimationFrame(tick);
+			requestAnimationFrame(tick);
 		};
 
-		frameId = requestAnimationFrame(tick);
-
-		const cleanup = () => cancelAnimationFrame(frameId);
-		void cleanup;
+		requestAnimationFrame(tick);
 	});
 }
 
@@ -124,7 +124,7 @@ export function useElementHighlightOverlay() {
 			}: HighlightOptions = {},
 		) => {
 			const element = resolveElement(target);
-			if (!element) return null;
+			if (!element) {return null;}
 
 			const currentRequestId = ++requestIdRef.current;
 
@@ -145,7 +145,7 @@ export function useElementHighlightOverlay() {
 			clearHighlight();
 			const overlay = createHighlightNode(rect, variant);
 			document.body.appendChild(overlay);
-			overlayRef.current = overlay as HTMLDivElement;
+			overlayRef.current = overlay;
 
 			if (autoRemoveMs) {
 				removeTimerRef.current = setTimeout(() => {

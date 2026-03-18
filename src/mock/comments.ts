@@ -1,6 +1,6 @@
-import type { Note, Reviewer } from "@/types";
+import type { ElementRect, Note, Reviewer } from "@/types";
 
-const emptyRect = {
+const emptyRect: ElementRect = {
 	x: 0,
 	y: 0,
 	width: 0,
@@ -9,8 +9,7 @@ const emptyRect = {
 	right: 0,
 	bottom: 0,
 	left: 0,
-	toJSON: () => ({}),
-} as DOMRect;
+};
 
 const V1_BASE = Date.UTC(2026, 2, 15, 14, 0, 0);
 const V2_BASE = Date.UTC(2026, 2, 16, 11, 0, 0);
@@ -57,7 +56,7 @@ const mockNotes: Note[] = [
 			cssSelector: "[data-note='billing-toggle']",
 			sourceFile: "src/components/demo/pricing-hero/index.tsx",
 		},
-		text: "Billing toggle doesn't announce selected state to screen readers. Needs role=\"radiogroup\" with aria-checked on each option.",
+		text: 'Billing toggle doesn\'t announce selected state to screen readers. Needs role="radiogroup" with aria-checked on each option.',
 		timestamp: V1_BASE + mins(3),
 		reviewer: ALEX,
 		deployVersion: "v1",
@@ -217,7 +216,7 @@ const mockNotes: Note[] = [
 			cssSelector: "[data-note='popular-badge']",
 			sourceFile: "src/components/demo/pricing-card/index.tsx",
 		},
-		text: "Padding fix on Pro card shifted the \"Most popular\" badge. It's now misaligned — -top-3 needs adjusting to -top-2.5.",
+		text: 'Padding fix on Pro card shifted the "Most popular" badge. It\'s now misaligned — -top-3 needs adjusting to -top-2.5.',
 		timestamp: V2_BASE,
 		reviewer: SAM,
 		deployVersion: "v2",
@@ -235,7 +234,7 @@ const mockNotes: Note[] = [
 			cssSelector: "[data-note='price-pro']",
 			sourceFile: "src/components/demo/pricing-card/index.tsx",
 		},
-		text: "The dollar sign should be slightly smaller than the number — consider text-3xl for the \"$\" and keeping the amount at text-5xl.",
+		text: 'The dollar sign should be slightly smaller than the number — consider text-3xl for the "$" and keeping the amount at text-5xl.',
 		timestamp: V2_BASE + mins(15),
 		reviewer: JORDAN,
 		deployVersion: "v2",

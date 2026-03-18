@@ -38,7 +38,7 @@ function scaleBoxValue(
 	maxValue: number,
 	maxSize: number,
 ): number {
-	if (value <= 0 || maxValue <= 0) return 0;
+	if (value <= 0 || maxValue <= 0) {return 0;}
 
 	return Math.max(12, Math.round((value / maxValue) * maxSize));
 }

@@ -75,7 +75,7 @@ export function getCssSelector(el: HTMLElement): string {
 /** Extract Tailwind spacing and sizing classes from an element. */
 export function extractTailwindSpacing(el: HTMLElement): string[] {
 	const className = el.className;
-	if (!className || typeof className !== "string") return [];
+	if (!className || typeof className !== "string") {return [];}
 
 	const spacingPattern =
 		/^-?(p|px|py|pt|pr|pb|pl|m|mx|my|mt|mr|mb|ml|gap|gap-x|gap-y|space-x|space-y|w|h|min-w|min-h|max-w|max-h|inset|top|right|bottom|left)-/;

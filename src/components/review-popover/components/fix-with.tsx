@@ -16,9 +16,6 @@ import ReplitIcon from "@/ui/icons/replit";
 import V0Icon from "@/ui/icons/v0";
 import { toast } from "@/ui/toaster";
 
-const placeholderCharacterPattern = /\u200B|\u200C|\u200D|\uFEFF/g;
-const nbspEntityPattern = /&nbsp;|&#160;|&#xA0;/gi;
-const nonBreakingSpaceCharacterPattern = /\u00A0/g;
 const FIX_WITH_ICONS: Record<FixWithTargetId, React.ComponentType> = {
 	conductor: ConductorIcon,
 	cursor: CursorIcon,
@@ -32,19 +29,14 @@ interface FixWithMenuProps {
 
 export default function FixWithMenu({ prompt }: FixWithMenuProps) {
 	const promptValue = prompt.trim();
-	const hasMeaningfulPrompt =
-		promptValue
-			.replace(placeholderCharacterPattern, "")
-			.replace(nbspEntityPattern, "")
-			.replace(nonBreakingSpaceCharacterPattern, " ")
-			.trim().length > 0;
+	const hasMeaningfulPrompt = promptValue.length > 0;
 
 	const handleSelectTarget = useCallback(
 		(targetId: FixWithTargetId) => {
-			if (!hasMeaningfulPrompt) return;
+			if (!hasMeaningfulPrompt) {return;}
 
 			const target = fixWithTargets.find((item) => item.id === targetId);
-			if (!target) return;
+			if (!target) {return;}
 
 			if (target.status !== "ready" || !target.hrefPrefix) {
 				toast.message(
@@ -81,7 +73,7 @@ export default function FixWithMenu({ prompt }: FixWithMenuProps) {
 			{fixWithTargets.map((target) => (
 				<DropdownItem
 					key={target.id}
-					onClick={() => handleSelectTarget(target.id)}
+					onSelect={() => handleSelectTarget(target.id)}
 					className="justify-between"
 				>
 					<span className="flex min-w-0 items-center gap-2">

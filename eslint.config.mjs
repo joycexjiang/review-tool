@@ -8,6 +8,7 @@ const eslintConfig = defineConfig([
 	{
 		files: ["src/**/*.{ts,tsx}"],
 		rules: {
+			curly: ["error", "all"],
 			"no-restricted-imports": [
 				"error",
 				{
@@ -21,6 +22,16 @@ const eslintConfig = defineConfig([
 					],
 				},
 			],
+			"no-restricted-syntax": [
+				"error",
+				{
+					selector: "ImportExpression",
+					message:
+						"Use standard import statements at the top of the file. Avoid dynamic imports in app code.",
+				},
+			],
+			"@typescript-eslint/no-explicit-any": "error",
+			"@typescript-eslint/no-non-null-assertion": "error",
 		},
 	},
 	{

@@ -24,6 +24,6 @@ export function HoverProvider({ children }: { children: React.ReactNode }) {
 export function useHoverContext() {
 	const ctx = useContext(HoverContext);
 	if (!ctx)
-		throw new Error("useHoverContext must be used within HoverProvider");
+		{throw new Error("useHoverContext must be used within HoverProvider");}
 	return ctx;
 }

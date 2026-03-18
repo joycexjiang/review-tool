@@ -33,6 +33,7 @@ export default function ProgressRing({
 				height={size}
 				className="-rotate-90"
 				viewBox={`0 0 ${size} ${size}`}
+				aria-hidden="true"
 			>
 				<circle
 					cx={size / 2}

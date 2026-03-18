@@ -8,13 +8,22 @@ import {
 	useReducer,
 } from "react";
 import { useHoverContext } from "@/components/inspector/element-hover/hover-context";
-import type { CommentType, Note } from "@/types";
+import { useInspectorHotkeys } from "@/components/inspector/hooks/use-inspector-hotkeys";
+import type { CommentType, DeployVersion, Note } from "@/types";
 import { AnnouncementReset } from "./announcement-reset";
 import { createInitialInspectorState, inspectorReducer } from "./reducer";
-import type { InspectorState, ToolbarSide } from "./types";
-import { useInspectorHotkeys } from "./use-inspector-hotkeys";
+import {
+	getPanelMode,
+	getSelectedElement,
+	type InspectorStateView,
+	isDrawerResizing,
+	isInspectMode,
+	isPanelOpen,
+	isPopoverOpen,
+	type ToolbarSide,
+} from "./types";
 
-const InspectorStateContext = createContext<InspectorState | null>(null);
+const InspectorStateContext = createContext<InspectorStateView | null>(null);
 
 interface InspectorActions {
 	toggleInspectMode: () => void;
@@ -23,14 +32,18 @@ interface InspectorActions {
 	addNote: (note: Note) => void;
 	toggleResolve: (id: string) => void;
 	togglePanel: () => void;
+	togglePanelMode: () => void;
 	scrollToNote: (id: string) => void;
 	setActiveNote: (id: string | null) => void;
 	announce: (message: string) => void;
 	clearHighlightedNote: () => void;
-	setActiveDeploy: (version: string) => void;
+	setActiveDeploy: (version: DeployVersion) => void;
 	setTypeFilter: (type: CommentType | null) => void;
+	setDrawerWidth: (width: number) => void;
+	setDrawerResizing: (isResizing: boolean) => void;
 	setToolbarSide: (side: ToolbarSide) => void;
 	setToolbarWidth: (width: number) => void;
+	setToolbarHeight: (height: number) => void;
 	setToolbarY: (y: number | null) => void;
 }
 
@@ -69,6 +82,10 @@ export function InspectorProvider({ children }: { children: React.ReactNode }) {
 		dispatch({ type: "TOGGLE_PANEL" });
 	}, []);
 
+	const togglePanelMode = useCallback(() => {
+		dispatch({ type: "TOGGLE_PANEL_MODE" });
+	}, []);
+
 	const scrollToNote = useCallback((id: string) => {
 		dispatch({ type: "SCROLL_TO_NOTE", payload: id });
 	}, []);
@@ -85,12 +102,20 @@ export function InspectorProvider({ children }: { children: React.ReactNode }) {
 		dispatch({ type: "CLEAR_HIGHLIGHT" });
 	}, []);
 
-	const setActiveDeploy = useCallback((version: string) => {
+	const setActiveDeploy = useCallback((version: DeployVersion) => {
 		dispatch({ type: "SET_ACTIVE_DEPLOY", payload: version });
 	}, []);
 
 	const setTypeFilter = useCallback((type: CommentType | null) => {
 		dispatch({ type: "SET_TYPE_FILTER", payload: type });
+	}, []);
+
+	const setDrawerWidth = useCallback((width: number) => {
+		dispatch({ type: "SET_DRAWER_WIDTH", payload: width });
+	}, []);
+
+	const setDrawerResizing = useCallback((isResizing: boolean) => {
+		dispatch({ type: "SET_DRAWER_RESIZING", payload: isResizing });
 	}, []);
 
 	const setToolbarSide = useCallback((side: ToolbarSide) => {
@@ -101,11 +126,28 @@ export function InspectorProvider({ children }: { children: React.ReactNode }) {
 		dispatch({ type: "SET_TOOLBAR_WIDTH", payload: width });
 	}, []);
 
+	const setToolbarHeight = useCallback((height: number) => {
+		dispatch({ type: "SET_TOOLBAR_HEIGHT", payload: height });
+	}, []);
+
 	const setToolbarY = useCallback((y: number | null) => {
 		dispatch({ type: "SET_TOOLBAR_Y", payload: y });
 	}, []);
 
 	useInspectorHotkeys({ toggleInspectMode, togglePanel });
+
+	const stateView = useMemo<InspectorStateView>(
+		() => ({
+			...state,
+			inspectMode: isInspectMode(state.inspection),
+			selectedElement: getSelectedElement(state.inspection),
+			popoverOpen: isPopoverOpen(state.inspection),
+			panelOpen: isPanelOpen(state.reviewPopover),
+			panelMode: getPanelMode(state.reviewPopover),
+			isResizingDrawer: isDrawerResizing(state.reviewPopover),
+		}),
+		[state],
+	);
 
 	const actions = useMemo<InspectorActions>(
 		() => ({
@@ -115,14 +157,18 @@ export function InspectorProvider({ children }: { children: React.ReactNode }) {
 			addNote,
 			toggleResolve,
 			togglePanel,
+			togglePanelMode,
 			scrollToNote,
 			setActiveNote,
 			announce,
 			clearHighlightedNote,
 			setActiveDeploy,
 			setTypeFilter,
+			setDrawerWidth,
+			setDrawerResizing,
 			setToolbarSide,
 			setToolbarWidth,
+			setToolbarHeight,
 			setToolbarY,
 		}),
 		[
@@ -132,30 +178,34 @@ export function InspectorProvider({ children }: { children: React.ReactNode }) {
 			addNote,
 			toggleResolve,
 			togglePanel,
+			togglePanelMode,
 			scrollToNote,
 			setActiveNote,
 			announce,
 			clearHighlightedNote,
 			setActiveDeploy,
 			setTypeFilter,
+			setDrawerWidth,
+			setDrawerResizing,
 			setToolbarSide,
 			setToolbarWidth,
+			setToolbarHeight,
 			setToolbarY,
 		],
 	);
 
 	return (
-		<InspectorStateContext.Provider value={state}>
+		<InspectorStateContext.Provider value={stateView}>
 			<InspectorActionsContext.Provider value={actions}>
 				{children}
-				{state.announcement ? (
+				{stateView.announcement ? (
 					<AnnouncementReset
-						key={state.announcement}
+						key={stateView.announcement}
 						onClear={() => dispatch({ type: "ANNOUNCE", payload: "" })}
 					/>
 				) : null}
 				<div aria-live="polite" aria-atomic="true" className="sr-only">
-					{state.announcement}
+					{stateView.announcement}
 				</div>
 			</InspectorActionsContext.Provider>
 		</InspectorStateContext.Provider>

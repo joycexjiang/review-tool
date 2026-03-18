@@ -3,7 +3,7 @@
 import { useHotkey } from "@/hooks/use-hotkey";
 
 function isEditableTarget(target: EventTarget | null) {
-	if (!(target instanceof HTMLElement)) return false;
+	if (!(target instanceof HTMLElement)) {return false;}
 	return (
 		target instanceof HTMLInputElement ||
 		target instanceof HTMLTextAreaElement ||

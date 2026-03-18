@@ -1,22 +1,32 @@
 "use client";
 
+import { useDeployNotes } from "@/components/inspector/hooks/use-note-views";
 import { useInspectorState } from "@/components/inspector/state/provider";
-import { useDeployNotes } from "@/hooks/use-filtered-notes";
+import { getPanelMode, isPanelOpen } from "@/components/inspector/state/types";
 import NumberBadgeOverlay from "./number-badge-overlay";
 import { useNumberBadges } from "./use-number-badges";
 
 export default function NumberBadges() {
-	const { notes, activeNoteId, panelOpen, activeDeploy } =
+	const { notes, activeNoteId, reviewPopover, drawerWidth, activeDeploy } =
 		useInspectorState();
+	const panelOpen = isPanelOpen(reviewPopover);
+	const panelMode = getPanelMode(reviewPopover);
 	const deployNotes = useDeployNotes(notes, activeDeploy);
-	const { entries, positions } = useNumberBadges(deployNotes, panelOpen);
+	const { entries, positions } = useNumberBadges(
+		deployNotes,
+		panelOpen,
+		panelMode,
+		drawerWidth,
+	);
 	const hasActiveNote = activeNoteId !== null;
 
 	return (
 		<>
 			{entries.map((entry) => {
 				const position = positions.get(entry.id);
-				if (!position) return null;
+				if (!position) {
+					return null;
+				}
 				return (
 					<NumberBadgeOverlay
 						key={entry.id}

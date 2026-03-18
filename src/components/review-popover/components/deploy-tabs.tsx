@@ -9,7 +9,7 @@ export default function DeployTabs() {
 	const { deploys, activeDeploy } = useInspectorState();
 	const { setActiveDeploy } = useInspectorActions();
 
-	if (deploys.length <= 1) return null;
+	if (deploys.length <= 1) {return null;}
 
 	return (
 		<div

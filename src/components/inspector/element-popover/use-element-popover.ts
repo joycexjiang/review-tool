@@ -21,7 +21,7 @@ export function usePreviousFocus(
 	const previousFocusRef = useRef<HTMLElement | null>(null);
 
 	useEffect(() => {
-		if (!popoverOpen || !selectedElement) return;
+		if (!popoverOpen || !selectedElement) {return;}
 		previousFocusRef.current =
 			document.activeElement instanceof HTMLElement
 				? document.activeElement
@@ -40,7 +40,7 @@ export function usePopoverLayout(
 
 	const measure = useCallback(() => {
 		const popover = popoverRef.current;
-		if (!popover || !selectedElement) return;
+		if (!popover || !selectedElement) {return;}
 
 		const nextLayout: PopoverLayout = {
 			target: selectedElement,
@@ -56,7 +56,7 @@ export function usePopoverLayout(
 	}, [popoverRef, selectedElement]);
 
 	useEffect(() => {
-		if (!popoverOpen || !selectedElement) return;
+		if (!popoverOpen || !selectedElement) {return;}
 
 		let frame = requestAnimationFrame(measure);
 		const scheduleMeasure = () => {
@@ -91,10 +91,10 @@ export function useDialogFocusTrap(
 	onClose: () => void,
 ) {
 	useEffect(() => {
-		if (!popoverOpen || !layoutReady) return;
+		if (!popoverOpen || !layoutReady) {return;}
 
 		const popover = popoverRef.current;
-		if (!popover) return;
+		if (!popover) {return;}
 
 		const focusables = getFocusableElements(popover);
 		if (focusables.length > 0) {
@@ -111,10 +111,10 @@ export function useDialogFocusTrap(
 				return;
 			}
 
-			if (event.key !== "Tab") return;
+			if (event.key !== "Tab") {return;}
 
 			const currentFocusables = getFocusableElements(popover);
-			if (currentFocusables.length === 0) return;
+			if (currentFocusables.length === 0) {return;}
 
 			const first = currentFocusables[0];
 			const last = currentFocusables[currentFocusables.length - 1];

@@ -1,54 +1,64 @@
 "use client";
 
 import { useMemo } from "react";
+import type {
+	NoteView,
+	NoteViewStatus,
+	ReviewStats,
+} from "@/components/inspector/lib/note-view-types";
+import {
+	isFixedInDeployNote,
+	isNewNote,
+	isResolvedNote,
+} from "@/components/inspector/lib/note-view-types";
 import type { FilterState } from "@/components/inspector/state/types";
 import { DEPLOY_ORDER, isDeployAtOrBefore } from "@/mock/deploys";
-import type { Note, Severity } from "@/types";
+import type { DeployVersion, Note, Severity } from "@/types";
 
-export interface NoteView extends Note {
-	/** True if this note was auto-fixed in a later deploy that is at or before activeDeploy */
-	isFixedInDeploy: boolean;
-	/** True if this note was created in the active deploy (not inherited from a prior deploy) */
-	isNew: boolean;
-}
-
-/** Filter and enrich notes for the active deploy */
 export function useDeployNotes(
 	notes: Note[],
-	activeDeploy: string,
+	activeDeploy: DeployVersion,
 ): NoteView[] {
 	return useMemo(() => {
-		const isFirstDeploy =
-			DEPLOY_ORDER.indexOf(activeDeploy as "v1" | "v2") === 0;
+		const isFirstDeploy = activeDeploy === DEPLOY_ORDER[0];
 
 		return notes
 			.filter((note) => isDeployAtOrBefore(note.deployVersion, activeDeploy))
 			.map((note) => {
-				const isFixedInDeploy =
-					!!note.fixedInDeploy &&
-					isDeployAtOrBefore(note.fixedInDeploy, activeDeploy);
-
-				const effectiveResolved = note.fixedInDeploy
-					? isFixedInDeploy
-					: note.resolved;
+				let status: NoteViewStatus;
+				if (
+					note.fixedInDeploy &&
+					isDeployAtOrBefore(note.fixedInDeploy, activeDeploy)
+				) {
+					status = {
+						type: "fixed-in-deploy",
+						deploy: note.fixedInDeploy,
+					};
+				} else if (!isFirstDeploy && note.deployVersion === activeDeploy) {
+					status = { type: "new" };
+				} else if (note.resolved) {
+					status = { type: "resolved" };
+				} else {
+					status = { type: "open" };
+				}
 
 				return {
 					...note,
-					resolved: effectiveResolved,
-					isFixedInDeploy,
-					isNew: !isFirstDeploy && note.deployVersion === activeDeploy,
+					resolved: isResolvedNote({ ...note, status }),
+					status,
 				};
 			});
 	}, [notes, activeDeploy]);
 }
 
-/** Apply type filter to notes */
 export function useFilteredNotes(
 	notes: NoteView[],
 	filters: FilterState,
 ): NoteView[] {
 	return useMemo(() => {
-		if (!filters.type) return notes;
+		if (!filters.type) {
+			return notes;
+		}
 		return notes.filter((note) => note.type === filters.type);
 	}, [notes, filters]);
 }
@@ -59,32 +69,24 @@ const SEVERITY_ORDER: Record<Severity, number> = {
 	minor: 2,
 };
 
-/** Sort notes by severity (blocking → major → minor), then newest first */
 export function useSortedNotes(notes: NoteView[]): NoteView[] {
 	return useMemo(() => {
 		return [...notes].sort((a, b) => {
-			// Unresolved first, resolved last
-			if (a.resolved !== b.resolved) return a.resolved ? 1 : -1;
-			// Then by severity
-			const sevDiff =
+			const aResolved = isResolvedNote(a);
+			const bResolved = isResolvedNote(b);
+			if (aResolved !== bResolved) {
+				return aResolved ? 1 : -1;
+			}
+
+			const severityDiff =
 				SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity];
-			if (sevDiff !== 0) return sevDiff;
-			// Then newest first
+			if (severityDiff !== 0) {
+				return severityDiff;
+			}
+
 			return b.timestamp - a.timestamp;
 		});
 	}, [notes]);
-}
-
-/** Stats for the summary bar */
-export interface ReviewStats {
-	total: number;
-	resolved: number;
-	unresolved: number;
-	blocking: number;
-	major: number;
-	minor: number;
-	fixedInDeploy: number;
-	newInDeploy: number;
 }
 
 export function useReviewStats(notes: NoteView[]): ReviewStats {
@@ -101,7 +103,7 @@ export function useReviewStats(notes: NoteView[]): ReviewStats {
 		};
 
 		for (const note of notes) {
-			if (note.resolved) {
+			if (isResolvedNote(note)) {
 				stats.resolved++;
 			} else {
 				stats.unresolved++;
@@ -117,8 +119,13 @@ export function useReviewStats(notes: NoteView[]): ReviewStats {
 						break;
 				}
 			}
-			if (note.isFixedInDeploy) stats.fixedInDeploy++;
-			if (note.isNew) stats.newInDeploy++;
+
+			if (isFixedInDeployNote(note)) {
+				stats.fixedInDeploy++;
+			}
+			if (isNewNote(note)) {
+				stats.newInDeploy++;
+			}
 		}
 
 		return stats;

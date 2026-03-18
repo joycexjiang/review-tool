@@ -1,10 +1,10 @@
 "use client";
 
+import type { NoteView } from "@/components/inspector/lib/note-view-types";
 import {
 	useInspectorActions,
 	useInspectorState,
 } from "@/components/inspector/state/provider";
-import type { NoteView } from "@/hooks/use-filtered-notes";
 import type { CommentType } from "@/types";
 
 interface TypeFilterProps {
@@ -30,17 +30,13 @@ export default function TypeFilter({ deployNotes }: TypeFilterProps) {
 	};
 
 	return (
-		<div
-			className="flex gap-0.5"
-			role="tablist"
-			aria-label="Filter by type"
-		>
+		<div className="flex gap-0.5" role="tablist" aria-label="Filter by type">
 			{TYPE_OPTIONS.map(({ key, label }) => {
 				const count = counts[key];
 				const isActive =
 					key === "all" ? filters.type === null : filters.type === key;
 
-				if (count === 0 && key !== "all") return null;
+				if (count === 0 && key !== "all") {return null;}
 
 				return (
 					<button
@@ -56,9 +52,7 @@ export default function TypeFilter({ deployNotes }: TypeFilterProps) {
 						}`}
 					>
 						{label}
-						{isActive && (
-							<span className="ml-1 text-zinc-500">{count}</span>
-						)}
+						{isActive && <span className="ml-1 text-zinc-500">{count}</span>}
 					</button>
 				);
 			})}

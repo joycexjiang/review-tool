@@ -14,7 +14,7 @@ export function useTimeout(
 	const onTimeout = useEffectEvent(callback);
 
 	useEffect(() => {
-		if (!enabled || delayMs === null) return;
+		if (!enabled || delayMs === null) {return;}
 
 		const timeout = setTimeout(() => {
 			onTimeout();

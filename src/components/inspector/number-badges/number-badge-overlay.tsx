@@ -23,7 +23,7 @@ export default function NumberBadgeOverlay({
 		scrollToNote(entry.id);
 	}, [scrollToNote, entry.id]);
 
-	if (typeof document === "undefined") return null;
+	if (typeof document === "undefined") {return null;}
 
 	return createPortal(
 		<div

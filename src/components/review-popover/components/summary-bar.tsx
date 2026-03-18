@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReviewStats } from "@/hooks/use-filtered-notes";
+import type { ReviewStats } from "@/components/inspector/lib/note-view-types";
 import ProgressRing from "./progress-ring";
 
 interface SummaryBarProps {
@@ -14,9 +14,7 @@ export default function SummaryBar({ stats }: SummaryBarProps) {
 		<div className="flex items-center gap-3">
 			<ProgressRing resolved={stats.resolved} total={stats.total} />
 			<span className="text-[12px] text-zinc-400">
-				{allResolved
-					? "All resolved"
-					: `${stats.unresolved} remaining`}
+				{allResolved ? "All resolved" : `${stats.unresolved} remaining`}
 			</span>
 		</div>
 	);

@@ -22,10 +22,10 @@ export function useEventListener(
 	const onEvent = useEffectEvent(listener);
 
 	useEffect(() => {
-		if (!enabled) return;
+		if (!enabled) {return;}
 
 		const eventTarget = resolveTarget(target);
-		if (!eventTarget) return;
+		if (!eventTarget) {return;}
 
 		const handler: EventListener = (event) => {
 			onEvent(event);

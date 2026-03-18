@@ -26,25 +26,24 @@ interface DragState {
 interface UseDockedFloatingPositionOptions {
 	side: ToolbarSide;
 	y: number | null;
+	viewportHeight?: number | null;
+	viewportWidth?: number | null;
 	sideOffset?: number;
 	defaultTop?: number;
 	defaultBottom?: number;
 	onSideChange?: (side: ToolbarSide) => void;
 	onWidthChange?: (width: number) => void;
+	onHeightChange?: (height: number) => void;
 	onYChange?: (y: number | null) => void;
 	canStartDrag?: (target: HTMLElement) => boolean;
 }
 
-function getViewportWidth(): number | null {
-	return typeof window === "undefined" ? null : window.innerWidth;
-}
-
-function getViewportHeight(): number | null {
-	return typeof window === "undefined" ? null : window.innerHeight;
-}
-
-function getSnappedLeft(side: ToolbarSide, width: number, sideOffset: number) {
-	const viewportWidth = getViewportWidth();
+function getSnappedLeft(
+	side: ToolbarSide,
+	width: number,
+	sideOffset: number,
+	viewportWidth: number | null,
+) {
 	if (viewportWidth === null) {
 		return sideOffset;
 	}
@@ -52,8 +51,7 @@ function getSnappedLeft(side: ToolbarSide, width: number, sideOffset: number) {
 	return side === "left" ? sideOffset : viewportWidth - width - sideOffset;
 }
 
-function clampY(y: number, height: number) {
-	const viewportHeight = getViewportHeight();
+function clampY(y: number, height: number, viewportHeight: number | null) {
 	if (viewportHeight === null) {
 		return EDGE_MARGIN;
 	}
@@ -67,11 +65,14 @@ function clampY(y: number, height: number) {
 export function useDockedFloatingPosition({
 	side,
 	y,
+	viewportHeight = null,
+	viewportWidth = null,
 	sideOffset = EDGE_MARGIN,
 	defaultTop = EDGE_MARGIN,
 	defaultBottom,
 	onSideChange,
 	onWidthChange,
+	onHeightChange,
 	onYChange,
 	canStartDrag,
 }: UseDockedFloatingPositionOptions) {
@@ -88,17 +89,26 @@ export function useDockedFloatingPosition({
 			const nextHeight = node?.offsetHeight ?? 0;
 			setNodeSize({ width: nextWidth, height: nextHeight });
 			onWidthChange?.(nextWidth);
+			onHeightChange?.(nextHeight);
 		},
-		[onWidthChange],
+		[onHeightChange, onWidthChange],
 	);
 
 	const handlePointerDown = useCallback<PointerEventHandler<HTMLDivElement>>(
 		(e) => {
-			const target = e.target as HTMLElement;
-			if (canStartDrag && !canStartDrag(target)) return;
+			if (!(e.target instanceof HTMLElement)) {
+				return;
+			}
+
+			const target = e.target;
+			if (canStartDrag && !canStartDrag(target)) {
+				return;
+			}
 
 			const node = nodeRef.current;
-			if (!node) return;
+			if (!node) {
+				return;
+			}
 
 			node.setPointerCapture(e.pointerId);
 			setIsSnapping(false);
@@ -120,7 +130,9 @@ export function useDockedFloatingPosition({
 		(e) => {
 			const currentDrag = dragState.current;
 			const node = nodeRef.current;
-			if (!currentDrag?.dragging || !node) return;
+			if (!currentDrag?.dragging || !node) {
+				return;
+			}
 
 			const deltaX = e.clientX - currentDrag.startX;
 			const deltaY = e.clientY - currentDrag.startY;
@@ -135,12 +147,16 @@ export function useDockedFloatingPosition({
 			currentDrag.moved = true;
 
 			const newX = e.clientX - currentDrag.offsetX;
-			const newY = clampY(e.clientY - currentDrag.offsetY, node.offsetHeight);
+			const newY = clampY(
+				e.clientY - currentDrag.offsetY,
+				node.offsetHeight,
+				viewportHeight,
+			);
 
 			setDragXY({ x: newX, y: newY });
 			onYChange?.(newY);
 		},
-		[onYChange],
+		[onYChange, viewportHeight],
 	);
 
 	const handlePointerEnd = useCallback<PointerEventHandler<HTMLDivElement>>(
@@ -161,12 +177,13 @@ export function useDockedFloatingPosition({
 				const centerX = rect.left + rect.width / 2;
 				const nextSide: ToolbarSide =
 					centerX < window.innerWidth / 2 ? "left" : "right";
-				const nextY = clampY(rect.top, node.offsetHeight);
+				const nextY = clampY(rect.top, node.offsetHeight, viewportHeight);
 
 				setIsSnapping(true);
 				setDragXY(null);
 				setNodeSize({ width: rect.width, height: rect.height });
 				onWidthChange?.(rect.width);
+				onHeightChange?.(rect.height);
 				onSideChange?.(nextSide);
 				onYChange?.(nextY);
 			}
@@ -174,7 +191,7 @@ export function useDockedFloatingPosition({
 			currentDrag.dragging = false;
 			dragState.current = null;
 		},
-		[onSideChange, onWidthChange, onYChange],
+		[onHeightChange, onSideChange, onWidthChange, onYChange, viewportHeight],
 	);
 
 	useEventListener(
@@ -182,15 +199,18 @@ export function useDockedFloatingPosition({
 		"resize",
 		() => {
 			const node = nodeRef.current;
-			if (!node) return;
+			if (!node) {
+				return;
+			}
 
 			const nextWidth = node.offsetWidth;
 			const nextHeight = node.offsetHeight;
 			setNodeSize({ width: nextWidth, height: nextHeight });
 			onWidthChange?.(nextWidth);
+			onHeightChange?.(nextHeight);
 
 			if (y !== null) {
-				onYChange?.(clampY(y, nextHeight));
+				onYChange?.(clampY(y, nextHeight, window.innerHeight));
 			}
 		},
 		undefined,
@@ -216,7 +236,7 @@ export function useDockedFloatingPosition({
 		};
 	} else {
 		positionStyle = {
-			left: getSnappedLeft(side, nodeSize.width, sideOffset),
+			left: getSnappedLeft(side, nodeSize.width, sideOffset, viewportWidth),
 			top: y,
 			transition: isSnapping ? SNAP_TRANSITION : "none",
 		};

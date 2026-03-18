@@ -1,5 +1,6 @@
 export type CommentType = "bug" | "suggestion" | "question";
 export type Severity = "blocking" | "major" | "minor";
+export type DeployVersion = "v1" | "v2";
 
 export interface Reviewer {
 	name: string;
@@ -7,16 +8,27 @@ export interface Reviewer {
 
 export interface Deploy {
 	id: string;
-	version: string;
+	version: DeployVersion;
 	label: string;
 	timestamp: number;
 	status: "active" | "superseded";
 }
 
+export interface ElementRect {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	top: number;
+	right: number;
+	bottom: number;
+	left: number;
+}
+
 export interface ElementInfo {
 	tagName: string;
 	className: string;
-	boundingRect: DOMRect;
+	boundingRect: ElementRect;
 	cssSelector: string;
 	sourceFile?: string;
 	sourceLine?: number;
@@ -45,7 +57,7 @@ export interface Note {
 	relativeTimeLabel?: string;
 	resolved: boolean;
 	reviewer: Reviewer;
-	deployVersion: string;
+	deployVersion: DeployVersion;
 	area: string;
-	fixedInDeploy?: string;
+	fixedInDeploy?: DeployVersion;
 }

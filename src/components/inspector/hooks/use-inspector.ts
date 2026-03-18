@@ -10,6 +10,10 @@ import {
 	useInspectorActions,
 	useInspectorState,
 } from "@/components/inspector/state/provider";
+import {
+	isInspectMode,
+	isPopoverOpen,
+} from "@/components/inspector/state/types";
 import { useEventListener } from "@/hooks/use-event-listener";
 import { useUnmount } from "@/hooks/use-unmount";
 
@@ -18,79 +22,95 @@ const IGNORED_SELECTORS = [
 	"[data-inspector-tooltip]",
 	"[data-inspector-popover]",
 	"[data-toolbar]",
-	"[data-side-panel]",
+	"[data-review-popover]",
 ];
 
 function isInspectorUI(el: HTMLElement): boolean {
 	return IGNORED_SELECTORS.some((sel) => el.closest(sel) !== null);
 }
 
+function getTargetElement(event: Event): HTMLElement | null {
+	return event.target instanceof HTMLElement ? event.target : null;
+}
+
 export function useInspector(
 	containerRef: React.RefObject<HTMLElement | null>,
 ) {
-	const { inspectMode, popoverOpen } = useInspectorState();
+	const { inspection } = useInspectorState();
 	const { selectElement } = useInspectorActions();
 	const { setHoveredElement } = useHoverContext();
+	const inspectModeActive = isInspectMode(inspection);
+	const hasSelection = isPopoverOpen(inspection);
 
 	const rafRef = useRef<number>(0);
 
 	const handleMouseMove = useCallback(
 		(e: MouseEvent) => {
-			if (!inspectMode || popoverOpen) return;
+			if (!inspectModeActive || hasSelection) {
+				return;
+			}
 
 			cancelAnimationFrame(rafRef.current);
 			rafRef.current = requestAnimationFrame(() => {
-				const target = document.elementFromPoint(
-					e.clientX,
-					e.clientY,
-				) as HTMLElement | null;
-				if (!target || isInspectorUI(target)) {
+				const target = document.elementFromPoint(e.clientX, e.clientY);
+				if (!(target instanceof HTMLElement) || isInspectorUI(target)) {
 					setHoveredElement(null);
 					return;
 				}
+
 				setHoveredElement(target);
 			});
 		},
-		[inspectMode, popoverOpen, setHoveredElement],
+		[hasSelection, inspectModeActive, setHoveredElement],
 	);
 
 	const handleClick = useCallback(
 		(e: MouseEvent) => {
-			if (!inspectMode) return;
+			if (!inspectModeActive) {
+				return;
+			}
 
-			const target = e.target as HTMLElement;
-			if (isInspectorUI(target)) return;
+			const target = getTargetElement(e);
+			if (!target || isInspectorUI(target)) {
+				return;
+			}
 
 			e.preventDefault();
 			e.stopPropagation();
 
 			selectElement(target);
 		},
-		[inspectMode, selectElement],
+		[inspectModeActive, selectElement],
 	);
 
 	const handleMouseLeave = useCallback(() => {
-		if (!inspectMode) return;
+		if (!inspectModeActive) {
+			return;
+		}
 		setHoveredElement(null);
-	}, [inspectMode, setHoveredElement]);
+	}, [inspectModeActive, setHoveredElement]);
 
 	useEventListener(
 		() => containerRef.current,
 		"mousemove",
 		(event) => {
-			handleMouseMove(event as MouseEvent);
+			if (event instanceof MouseEvent) {
+				handleMouseMove(event);
+			}
 		},
 		true,
-		inspectMode,
+		inspectModeActive,
 	);
 	useEventListener(
 		() => containerRef.current,
 		"click",
 		(event) => {
-			handleClick(event as MouseEvent);
+			if (event instanceof MouseEvent) {
+				handleClick(event);
+			}
 		},
 		true,
-		inspectMode,
+		inspectModeActive,
 	);
 	useEventListener(
 		() => containerRef.current,
@@ -99,7 +119,7 @@ export function useInspector(
 			handleMouseLeave();
 		},
 		undefined,
-		inspectMode,
+		inspectModeActive,
 	);
 	useUnmount(() => cancelAnimationFrame(rafRef.current));
 }

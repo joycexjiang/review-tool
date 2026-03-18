@@ -2,6 +2,7 @@
 
 import { extractTailwindSpacing } from "@/components/inspector/lib/dom-utils";
 import { useInspectorState } from "@/components/inspector/state/provider";
+import { isInspectionArmed } from "@/components/inspector/state/types";
 import { useResolvedSource } from "@/hooks/use-resolved-source";
 import { useHoverContext } from "./hover-context";
 
@@ -18,12 +19,14 @@ interface TooltipPosition {
 }
 
 export default function HoverOverlay() {
-	const { inspectMode, popoverOpen } = useInspectorState();
+	const { inspection } = useInspectorState();
 	const { hoveredElement } = useHoverContext();
-	const activeElement = inspectMode && !popoverOpen ? hoveredElement : null;
+	const activeElement = isInspectionArmed(inspection) ? hoveredElement : null;
 	const { sourceFile } = useResolvedSource(activeElement);
 
-	if (!activeElement) return null;
+	if (!activeElement) {
+		return null;
+	}
 
 	const rect = activeElement.getBoundingClientRect();
 	const overlay: OverlayPosition = {

@@ -18,11 +18,9 @@ export function resolveBadgeEntries(notes: Note[]): BadgeEntry[] {
 			continue;
 		}
 
-		const targetEl = document.querySelector(
-			note.elementInfo.cssSelector,
-		) as HTMLElement | null;
+		const targetEl = document.querySelector(note.elementInfo.cssSelector);
 
-		if (!targetEl) {
+		if (!(targetEl instanceof HTMLElement)) {
 			sequentialIndex++;
 			continue;
 		}
