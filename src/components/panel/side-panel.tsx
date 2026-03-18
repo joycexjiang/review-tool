@@ -27,13 +27,17 @@ import { toast } from "@/ui/toaster";
 import DeployTabs from "./deploy-tabs";
 import FixWithMenu from "./fix-with";
 import TypeFilter from "./grouping-controls";
+import {
+	REVIEW_POPOVER_DRAWER_WIDTH,
+	REVIEW_POPOVER_EDGE_MARGIN,
+} from "./review-popover-layout";
 import SummaryBar from "./summary-bar";
 
-const TOOLBAR_EDGE_MARGIN = 12;
 const PANEL_TOOLBAR_GAP = 40;
-const PANEL_WIDTH = 420;
+const PANEL_FLOATING_WIDTH = 420;
 const PANEL_HEIGHT_OFFSET = 154;
-const PANEL_VIEWPORT_MARGIN = 12;
+const PANEL_TRANSITION =
+	"transform 260ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease-out";
 
 // ─── Helpers ────────────────────────────────────────────────
 
@@ -71,13 +75,14 @@ function clampPanelTop(top: number | undefined) {
 	}
 
 	const panelHeight =
-		window.innerHeight - (PANEL_VIEWPORT_MARGIN * 2 + PANEL_HEIGHT_OFFSET);
+		window.innerHeight -
+		(REVIEW_POPOVER_EDGE_MARGIN * 2 + PANEL_HEIGHT_OFFSET);
 	const maxTop = Math.max(
-		PANEL_VIEWPORT_MARGIN,
-		window.innerHeight - panelHeight - PANEL_VIEWPORT_MARGIN,
+		REVIEW_POPOVER_EDGE_MARGIN,
+		window.innerHeight - panelHeight - REVIEW_POPOVER_EDGE_MARGIN,
 	);
 
-	return Math.max(PANEL_VIEWPORT_MARGIN, Math.min(maxTop, top));
+	return Math.max(REVIEW_POPOVER_EDGE_MARGIN, Math.min(maxTop, top));
 }
 
 // ─── Highlighted note scroller ──────────────────────────────
@@ -192,9 +197,10 @@ function useKeyboardNav(
 
 // ─── Main panel ─────────────────────────────────────────────
 
-export default function SidePanel() {
+export default function ReviewPopover() {
 	const {
 		panelOpen,
+		panelMode,
 		notes,
 		popoverOpen,
 		highlightedNoteId,
@@ -208,6 +214,7 @@ export default function SidePanel() {
 		announce,
 		clearHighlightedNote,
 		togglePanel,
+		togglePanelMode,
 		toggleResolve,
 		setToolbarSide,
 		setToolbarY,
@@ -268,7 +275,8 @@ export default function SidePanel() {
 	const isFilteredEmpty = filteredNotes.length === 0 && deployNotes.length > 0;
 	const isLeft = toolbarSide === "left";
 	const panelEdgeOffset =
-		TOOLBAR_EDGE_MARGIN + toolbarWidth + PANEL_TOOLBAR_GAP;
+		REVIEW_POPOVER_EDGE_MARGIN + toolbarWidth + PANEL_TOOLBAR_GAP;
+	const isDrawerMode = panelMode === "drawer";
 	const {
 		elementRef,
 		positionStyle,
@@ -280,7 +288,7 @@ export default function SidePanel() {
 		side: toolbarSide,
 		y: toolbarY,
 		sideOffset: panelEdgeOffset,
-		defaultTop: PANEL_VIEWPORT_MARGIN,
+		defaultTop: REVIEW_POPOVER_EDGE_MARGIN,
 		onSideChange: setToolbarSide,
 		onYChange: setToolbarY,
 		canStartDrag: (target) =>
@@ -288,27 +296,40 @@ export default function SidePanel() {
 			!target.closest("button"),
 	});
 
+	const floatingTop =
+		typeof positionStyle.top === "number"
+			? clampPanelTop(positionStyle.top)
+			: positionStyle.top;
+
 	// Stagger index across all sections
 	let itemIndex = 0;
 
 	return (
 		<div
 			ref={elementRef}
-			data-side-panel
-			onPointerDown={handlePointerDown}
-			onPointerMove={handlePointerMove}
-			onPointerUp={handlePointerUp}
-			onPointerCancel={handlePointerCancel}
+			data-review-popover
+			onPointerDown={isDrawerMode ? undefined : handlePointerDown}
+			onPointerMove={isDrawerMode ? undefined : handlePointerMove}
+			onPointerUp={isDrawerMode ? undefined : handlePointerUp}
+			onPointerCancel={isDrawerMode ? undefined : handlePointerCancel}
 			className={`fixed z-10002 ${
 				panelOpen ? "" : "pointer-events-none"
 			}`}
 			style={{
-				...positionStyle,
-				top:
-					typeof positionStyle.top === "number"
-						? clampPanelTop(positionStyle.top)
-						: positionStyle.top,
-				width: PANEL_WIDTH,
+				...(isDrawerMode
+					? {
+							left: REVIEW_POPOVER_EDGE_MARGIN,
+							top: REVIEW_POPOVER_EDGE_MARGIN,
+							width: REVIEW_POPOVER_DRAWER_WIDTH,
+							transition: PANEL_TRANSITION,
+							transform: panelOpen ? "translateX(0)" : "translateX(-16px)",
+						}
+					: {
+							...positionStyle,
+							top: floatingTop,
+							width: PANEL_FLOATING_WIDTH,
+						}),
+				opacity: panelOpen ? 1 : 0,
 			}}
 		>
 			<aside
@@ -316,10 +337,20 @@ export default function SidePanel() {
 				className="ui-glass-panel flex w-full flex-col rounded-2xl"
 				style={{
 					backgroundColor: "rgb(255 255 255)",
-					height: `calc(100vh - ${PANEL_VIEWPORT_MARGIN * 2 + PANEL_HEIGHT_OFFSET}px)`,
+					height: isDrawerMode
+						? `calc(100vh - ${REVIEW_POPOVER_EDGE_MARGIN * 2}px)`
+						: `calc(100vh - ${REVIEW_POPOVER_EDGE_MARGIN * 2 + PANEL_HEIGHT_OFFSET}px)`,
 					opacity: panelOpen ? 1 : 0,
-					transformOrigin: isLeft ? "left center" : "right center",
-					transform: panelOpen ? "scale(1)" : "scale(0.985)",
+					transformOrigin: isDrawerMode
+						? "left top"
+						: isLeft
+							? "left center"
+							: "right center",
+					transform: panelOpen
+						? "scale(1)"
+						: isDrawerMode
+							? "scale(0.995)"
+							: "scale(0.985)",
 					willChange: "transform, opacity",
 					transition: `transform ${panelOpen ? "220ms" : "140ms"} cubic-bezier(0.23, 1, 0.32, 1), opacity ${
 						panelOpen ? "220ms" : "140ms"
@@ -336,18 +367,32 @@ export default function SidePanel() {
 				) : null}
 
 				<div
-					data-panel-drag-handle
-					className="ui-glass-panel-header cursor-grab active:cursor-grabbing"
+					data-panel-drag-handle={isDrawerMode ? undefined : true}
+					className={`ui-glass-panel-header ${
+						isDrawerMode ? "" : "cursor-grab active:cursor-grabbing"
+					}`}
 				>
 					{/* ── Header ─────────────────────────────────────── */}
 					<div className="flex items-center justify-between px-5 pt-5 pb-4">
 						<h2 className="text-[14px] font-semibold text-zinc-900">Review</h2>
 						<div className="flex items-center gap-1">
+							<button
+								type="button"
+								onClick={togglePanelMode}
+								className="h-7 rounded-lg px-2 text-[11px] font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/10 focus-visible:ring-offset-1"
+								aria-label={
+									isDrawerMode
+										? "Collapse review drawer into floating popover"
+										: "Expand review popover into left drawer"
+								}
+							>
+								{isDrawerMode ? "Collapse" : "Expand"}
+							</button>
 							<FixWithMenu prompt={fixPrompt} />
 							<button
 								type="button"
 								onClick={handleCopyAllMarkdown}
-								className="flex size-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/55 hover:text-zinc-600"
+								className="flex size-7 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/10 focus-visible:ring-offset-1"
 								aria-label="Copy all comments as Markdown"
 							>
 								{headerCopied ? (
@@ -359,8 +404,8 @@ export default function SidePanel() {
 							<button
 								type="button"
 								onClick={togglePanel}
-								className="flex size-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/55 hover:text-zinc-600"
-								aria-label="Close review panel"
+								className="flex size-7 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/10 focus-visible:ring-offset-1"
+								aria-label="Close review popover"
 							>
 								<XMarkIcon className="size-3.5" />
 							</button>

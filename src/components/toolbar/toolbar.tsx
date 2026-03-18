@@ -69,13 +69,13 @@ export default function Toolbar() {
 				className="mx-0.5 h-5 border-l border-primary"
 			/>
 
-			<Tooltip label="Comments panel (⌘C)">
+			<Tooltip label="Review popover (⌘C)">
 				<Button
 					data-panel-toggle
 					size="icon"
 					onClick={togglePanel}
 					aria-expanded={panelOpen}
-					aria-label={`${panelOpen ? "Close" : "Open"} comments panel`}
+					aria-label={`${panelOpen ? "Close" : "Open"} review popover`}
 					className={cn(
 						"relative size-8 shrink-0 overflow-hidden rounded-full! p-0",
 						panelOpen ? "ui-toolbar-toggle-active" : "ui-toolbar-toggle",

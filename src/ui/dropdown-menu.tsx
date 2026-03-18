@@ -32,12 +32,12 @@ function DropdownMenu({
 					side={side}
 					align={align}
 					sideOffset={sideOffset}
-					className="isolate z-10001 outline-none"
+					className="isolate z-10005 outline-none"
 				>
 					<MenuPrimitive.Popup
 						data-slot="dropdown-menu-content"
 						className={cn(
-							"animate-popover-in z-10001 max-h-(--available-height) min-w-32 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border border-zinc-200 bg-white p-1 text-zinc-900 shadow-md ring-1 ring-zinc-950/5 outline-none",
+							"animate-popover-in z-10005 max-h-(--available-height) min-w-32 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border border-zinc-200 bg-white p-1 text-zinc-900 shadow-md ring-1 ring-zinc-950/5 outline-none",
 							className,
 						)}
 					>
@@ -51,21 +51,21 @@ function DropdownMenu({
 
 interface DropdownItemProps {
 	children: React.ReactNode;
-	onClick?: () => void;
+	onSelect?: () => void;
 	disabled?: boolean;
 	className?: string;
 }
 
 function DropdownItem({
 	children,
-	onClick,
+	onSelect,
 	disabled,
 	className = "",
 }: DropdownItemProps) {
 	return (
 		<MenuPrimitive.Item
 			data-slot="dropdown-menu-item"
-			onClick={onClick}
+			onSelect={onSelect}
 			disabled={disabled}
 			className={cn(
 				"group/dropdown-menu-item relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-zinc-700 outline-none select-none data-highlighted:bg-zinc-100 data-highlighted:text-zinc-900 data-disabled:pointer-events-none data-disabled:opacity-50",

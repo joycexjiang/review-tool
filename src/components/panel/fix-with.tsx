@@ -81,7 +81,7 @@ export default function FixWithMenu({ prompt }: FixWithMenuProps) {
 			{fixWithTargets.map((target) => (
 				<DropdownItem
 					key={target.id}
-					onClick={() => handleSelectTarget(target.id)}
+					onSelect={() => handleSelectTarget(target.id)}
 					className="justify-between"
 				>
 					<span className="flex min-w-0 items-center gap-2">

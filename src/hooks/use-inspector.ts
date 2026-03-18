@@ -18,7 +18,7 @@ const IGNORED_SELECTORS = [
 	"[data-inspector-tooltip]",
 	"[data-inspector-popover]",
 	"[data-toolbar]",
-	"[data-side-panel]",
+	"[data-review-popover]",
 ];
 
 function isInspectorUI(el: HTMLElement): boolean {

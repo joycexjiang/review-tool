@@ -16,7 +16,7 @@ import {
 } from "./use-element-popover";
 
 export default function ElementPopover() {
-	const { selectedElement, popoverOpen } = useInspectorState();
+	const { selectedElement, popoverOpen, activeDeploy } = useInspectorState();
 	const { closePopover, addNote } = useInspectorActions();
 
 	const popoverRef = useRef<HTMLDivElement>(null);
@@ -54,13 +54,13 @@ export default function ElementPopover() {
 				timestamp: Date.now(),
 				resolved: false,
 				reviewer: { name: "You" },
-				deployVersion: "v2",
+				deployVersion: activeDeploy,
 				area: "Pricing Card",
 			};
 			addNote(note);
 			handleClose();
 		},
-		[elementInfo, addNote, handleClose],
+		[elementInfo, addNote, handleClose, activeDeploy],
 	);
 
 	const cssSelector = elementInfo?.cssSelector ?? "";

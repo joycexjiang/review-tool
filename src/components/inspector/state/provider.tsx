@@ -23,6 +23,7 @@ interface InspectorActions {
 	addNote: (note: Note) => void;
 	toggleResolve: (id: string) => void;
 	togglePanel: () => void;
+	togglePanelMode: () => void;
 	scrollToNote: (id: string) => void;
 	setActiveNote: (id: string | null) => void;
 	announce: (message: string) => void;
@@ -67,6 +68,10 @@ export function InspectorProvider({ children }: { children: React.ReactNode }) {
 
 	const togglePanel = useCallback(() => {
 		dispatch({ type: "TOGGLE_PANEL" });
+	}, []);
+
+	const togglePanelMode = useCallback(() => {
+		dispatch({ type: "TOGGLE_PANEL_MODE" });
 	}, []);
 
 	const scrollToNote = useCallback((id: string) => {
@@ -115,6 +120,7 @@ export function InspectorProvider({ children }: { children: React.ReactNode }) {
 			addNote,
 			toggleResolve,
 			togglePanel,
+			togglePanelMode,
 			scrollToNote,
 			setActiveNote,
 			announce,
@@ -132,6 +138,7 @@ export function InspectorProvider({ children }: { children: React.ReactNode }) {
 			addNote,
 			toggleResolve,
 			togglePanel,
+			togglePanelMode,
 			scrollToNote,
 			setActiveNote,
 			announce,

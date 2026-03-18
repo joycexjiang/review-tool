@@ -118,6 +118,7 @@ export default function ElementPopoverContent({
 							size="icon-sm"
 							onClick={onClose}
 							aria-label="Close inspector"
+							className="text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700"
 						>
 							<XMarkIcon className="size-4" />
 						</Button>

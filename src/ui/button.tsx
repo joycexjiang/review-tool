@@ -3,10 +3,11 @@ import { forwardRef } from "react";
 
 const VARIANTS = {
 	primary:
-		"bg-classes text-white hover:bg-zinc-800 active:bg-zinc-950 disabled:opacity-40 disabled:cursor-not-allowed",
+		"bg-classes text-white enabled:hover:bg-zinc-800 enabled:active:bg-zinc-950 disabled:cursor-not-allowed disabled:opacity-40",
 	ghost:
-		"text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700 active:bg-zinc-200",
-	danger: "text-red-600 hover:bg-red-50 hover:text-red-700 active:bg-red-100",
+		"text-zinc-500 enabled:hover:bg-zinc-100 enabled:hover:text-zinc-700 enabled:active:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-40",
+	danger:
+		"text-red-600 enabled:hover:bg-red-50 enabled:hover:text-red-700 enabled:active:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40",
 } as const;
 
 const SIZES = {
@@ -30,7 +31,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 		return (
 			<BaseButton
 				ref={ref}
-				className={`inline-flex items-center rounded-md font-medium transition-colors ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
+				className={`inline-flex items-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/10 focus-visible:ring-offset-1 ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
 				{...props}
 			/>
 		);

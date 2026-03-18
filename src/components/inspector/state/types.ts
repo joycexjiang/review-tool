@@ -7,6 +7,7 @@ export interface FilterState {
 }
 
 export type ToolbarSide = "left" | "right";
+export type PanelMode = "floating" | "drawer";
 
 export interface InspectorState {
 	inspectMode: boolean;
@@ -14,6 +15,7 @@ export interface InspectorState {
 	popoverOpen: boolean;
 	notes: Note[];
 	panelOpen: boolean;
+	panelMode: PanelMode;
 	announcement: string;
 	highlightedNoteId: string | null;
 	activeNoteId: string | null;
@@ -32,6 +34,7 @@ export type InspectorAction =
 	| { type: "ADD_NOTE"; payload: Note }
 	| { type: "TOGGLE_RESOLVE"; payload: string }
 	| { type: "TOGGLE_PANEL" }
+	| { type: "TOGGLE_PANEL_MODE" }
 	| { type: "ANNOUNCE"; payload: string }
 	| { type: "SCROLL_TO_NOTE"; payload: string }
 	| { type: "SET_ACTIVE_NOTE"; payload: string | null }
@@ -52,11 +55,12 @@ export const initialInspectorState: InspectorState = {
 	popoverOpen: false,
 	notes: [],
 	panelOpen: true,
+	panelMode: "floating",
 	announcement: "",
 	highlightedNoteId: null,
 	activeNoteId: null,
 	deploys: [],
-	activeDeploy: "v2",
+	activeDeploy: "v1",
 	filters: initialFilters,
 	toolbarSide: "right",
 	toolbarWidth: 0,

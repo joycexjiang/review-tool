@@ -6,7 +6,12 @@ import { useClipboardCopy } from "@/hooks/use-clipboard-copy";
 import { useElementHighlightOverlay } from "@/hooks/use-element-highlight-overlay";
 import type { NoteView } from "@/hooks/use-filtered-notes";
 import { cn } from "@/lib/utils";
-import type { Note, Severity } from "@/types";
+import type { Note } from "@/types";
+import {
+	CommentSeverityBadge,
+	CommentSourceCode,
+	getCommentSourceLabel,
+} from "./comment-meta";
 import CheckIcon from "@/ui/icons/check";
 import CopyIcon from "@/ui/icons/copy";
 import XMarkIcon from "@/ui/icons/x-mark";
@@ -16,12 +21,6 @@ const TYPE_LABELS: Record<string, string> = {
 	bug: "Bug",
 	suggestion: "Suggestion",
 	question: "Question",
-};
-
-const SEVERITY_DOT: Record<Severity, string> = {
-	blocking: "bg-red-500",
-	major: "bg-amber-400",
-	minor: "bg-zinc-300",
 };
 
 interface TriageCommentCardProps extends ComponentPropsWithoutRef<"article"> {
@@ -64,30 +63,42 @@ export default function TriageCommentCard({
 			<article
 				data-note-id={note.id}
 				className={cn(
-					"group flex items-center gap-2.5 rounded-[10px] px-3 py-2 transition-colors duration-150 hover:bg-zinc-50",
+					"group rounded-[10px] px-3 py-2 transition-colors duration-150 hover:bg-zinc-50",
 					className,
 				)}
 				onMouseEnter={handleMouseEnter}
 				onMouseLeave={handleMouseLeave}
 				{...props}
 			>
-				<CheckIcon className="size-3.5 shrink-0 text-emerald-400" />
-				<p className="min-w-0 flex-1 truncate text-[13px] text-zinc-400 line-through decoration-zinc-300">
+				<div className="mb-1 flex items-center gap-1.5">
+					<CheckIcon className="size-3.5 shrink-0 text-emerald-400" />
+					<CommentSeverityBadge
+						severity={note.severity}
+						showLabel={false}
+						iconClassName="size-3.5"
+						className="text-zinc-400"
+					/>
+					<div className="flex-1" />
+					<button
+						type="button"
+						onClick={() => setIsExpanded(true)}
+						className="shrink-0 text-[11px] text-zinc-400 opacity-0 transition-opacity duration-150 hover:text-zinc-600 group-hover:opacity-100"
+						aria-label="Expand resolved comment"
+					>
+						Show
+					</button>
+				</div>
+				<p className="truncate text-[13px] text-zinc-400 line-through decoration-zinc-300">
 					{note.text}
 				</p>
-				{note.isFixedInDeploy && (
-					<span className="shrink-0 text-[11px] text-zinc-400">
-						{note.fixedInDeploy}
-					</span>
-				)}
-				<button
-					type="button"
-					onClick={() => setIsExpanded(true)}
-					className="shrink-0 text-[11px] text-zinc-400 opacity-0 transition-opacity duration-150 hover:text-zinc-600 group-hover:opacity-100"
-					aria-label="Expand resolved comment"
-				>
-					Show
-				</button>
+				<div className="mt-1 flex items-center gap-2">
+					<CommentSourceCode source={note.elementInfo} />
+					{note.isFixedInDeploy ? (
+						<span className="shrink-0 text-[11px] text-zinc-400">
+							Fixed in {note.fixedInDeploy}
+						</span>
+					) : null}
+				</div>
 			</article>
 		);
 	}
@@ -110,7 +121,12 @@ export default function TriageCommentCard({
 		>
 			{/* Meta row */}
 			<div className="mb-1 flex items-center gap-1.5">
-				<span className={cn("size-[6px] shrink-0 rounded-full", SEVERITY_DOT[note.severity])} />
+				<CommentSeverityBadge
+					severity={note.severity}
+					showLabel={false}
+					iconClassName="size-3.5"
+					className="text-zinc-500"
+				/>
 				<span className="text-[12px] font-medium text-zinc-900">
 					{note.reviewer.name}
 				</span>
@@ -140,6 +156,9 @@ export default function TriageCommentCard({
 			>
 				{note.text}
 			</p>
+			<div className="mt-2 pl-[14px]">
+				<CommentSourceCode source={note.elementInfo} />
+			</div>
 
 			{/* Actions — appear on hover, subtle */}
 			<div className="mt-1.5 flex items-center gap-1 pl-[14px] opacity-0 transition-opacity duration-150 group-hover:opacity-100">
@@ -175,9 +194,7 @@ export default function TriageCommentCard({
 export function formatCommentMarkdown(note: Note): string {
 	const typeLabel = TYPE_LABELS[note.type] ?? note.type;
 	const tag = note.elementInfo.tagName.toLowerCase();
-	const sourceLabel = note.elementInfo.sourceFile
-		? `${note.elementInfo.sourceFile}${note.elementInfo.sourceLine ? `:${note.elementInfo.sourceLine}` : ""}`
-		: "—";
+	const sourceLabel = getCommentSourceLabel(note.elementInfo);
 
 	return `**[${typeLabel}]** (${note.severity}) on \`<${tag}>\`
 Source: \`${sourceLabel}\`

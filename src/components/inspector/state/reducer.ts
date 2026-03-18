@@ -10,7 +10,7 @@ export function createInitialInspectorState(): InspectorState {
 		...initialInspectorState,
 		notes: createMockNotes(),
 		deploys,
-		activeDeploy: "v2",
+		activeDeploy: "v1",
 	};
 }
 
@@ -64,6 +64,14 @@ export function inspectorReducer(
 
 		case "TOGGLE_PANEL":
 			return { ...state, panelOpen: !state.panelOpen };
+
+		case "TOGGLE_PANEL_MODE":
+			return {
+				...state,
+				panelMode: state.panelMode === "floating" ? "drawer" : "floating",
+				toolbarSide:
+					state.panelMode === "floating" ? "left" : state.toolbarSide,
+			};
 
 		case "ANNOUNCE":
 			return { ...state, announcement: action.payload };
