@@ -184,6 +184,5 @@ export function useReviewPopoverLayout({
 		isDrawerMode,
 		panelSide: toolbarSide,
 		positionStyle,
-		toolbarDefaultHeight: TOOLBAR_DEFAULT_HEIGHT,
 	};
 }

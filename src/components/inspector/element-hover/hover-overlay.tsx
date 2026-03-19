@@ -71,38 +71,36 @@ export default function HoverOverlay() {
 			</div>
 
 			{/* Tooltip */}
-			{tooltip && (
-				<div
-					data-inspector-tooltip
-					className="pointer-events-none fixed z-9999 rounded-md bg-[#313131] px-2.5 py-1.5 shadow-lg "
-					style={{
-						top: tooltip.top - window.scrollY,
-						left: tooltip.left - window.scrollX,
-					}}
-				>
-					<div className="flex items-center gap-2 text-xs text-white">
-						<span className="font-mono text-element">{elementLabel}</span>
-						<span className="text-element-size">{elementSize}</span>
-					</div>
-					{sourceFile && (
-						<div className="mt-0.5 font-mono text-xs text-sourcefile">
-							{sourceFile}
-						</div>
-					)}
-					{spacingClasses.length > 0 && (
-						<div className="mt-1 flex flex-wrap gap-1">
-							{spacingClasses.map((cls) => (
-								<span
-									key={cls}
-									className="rounded bg-classes px-1.5 py-0.5 font-mono text-xs text-classes"
-								>
-									{cls}
-								</span>
-							))}
-						</div>
-					)}
+			<div
+				data-inspector-tooltip
+				className="pointer-events-none fixed z-9999 rounded-md bg-[#313131] px-2.5 py-1.5 shadow-lg"
+				style={{
+					top: tooltip.top - window.scrollY,
+					left: tooltip.left - window.scrollX,
+				}}
+			>
+				<div className="flex items-center gap-2 text-xs text-white">
+					<span className="font-mono text-element">{elementLabel}</span>
+					<span className="text-element-size">{elementSize}</span>
 				</div>
-			)}
+				{sourceFile && (
+					<div className="mt-0.5 font-mono text-xs text-sourcefile">
+						{sourceFile}
+					</div>
+				)}
+				{spacingClasses.length > 0 && (
+					<div className="mt-1 flex flex-wrap gap-1">
+						{spacingClasses.map((cls) => (
+							<span
+								key={cls}
+								className="rounded bg-classes px-1.5 py-0.5 font-mono text-xs text-classes"
+							>
+								{cls}
+							</span>
+						))}
+					</div>
+				)}
+			</div>
 		</>
 	);
 }

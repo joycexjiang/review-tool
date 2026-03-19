@@ -234,8 +234,7 @@ export function useReviewPopoverController() {
 			floatingWidth: floating.width,
 			isDragging: positionStyle.cursor === "grabbing",
 			isDrawerMode,
-			isLeft: panelSide === "left",
-			panelOpen,
+		panelOpen,
 			panelSide,
 			onDrawerResize: (_event, _direction, resizedElement) => {
 				setDrawerWidth(resizedElement.getBoundingClientRect().width);

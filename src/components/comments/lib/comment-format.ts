@@ -16,12 +16,6 @@ export const COMMENT_TYPE_DOT: Record<CommentType, string> = {
 	question: "bg-amber-400",
 };
 
-export const COMMENT_SEVERITY_COLOR: Record<Severity, string> = {
-	blocking: "text-red-600",
-	major: "text-amber-600",
-	minor: "text-zinc-500",
-};
-
 export const COMMENT_SEVERITY_LABELS: Record<Severity, string> = {
 	blocking: "Blocking",
 	major: "Major",

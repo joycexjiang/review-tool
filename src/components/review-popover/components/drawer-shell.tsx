@@ -6,7 +6,7 @@ import { useReviewPopoverLayoutContext } from "../review-popover-context";
 const ENTER_TRANSITION =
 	"transform 260ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease-out";
 const EXIT_TRANSITION =
-	"transform 200ms cubic-bezier(0.55, 0, 1, 0.45), opacity 140ms ease-in";
+	"transform 200ms cubic-bezier(0.55, 0, 1, 0.45), opacity 140ms ease-out";
 
 export default function DrawerShell({
 	children,

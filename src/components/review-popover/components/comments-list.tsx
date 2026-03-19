@@ -1,7 +1,6 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useMemo } from "react";
 import TriageCommentCard from "@/components/comments/comment-card";
 import { COMMENT_SEVERITY_LABELS } from "@/components/comments/lib/comment-format";
 import { cn } from "@/lib/utils";
@@ -17,19 +16,6 @@ import {
 	FilteredEmptyReviewState,
 } from "./review-popover-empty-states";
 
-function useBadgeNumbers(deployNotes: { id: string; resolved: boolean }[]) {
-	return useMemo(() => {
-		const map = new Map<string, number>();
-		let seq = 1;
-		for (const note of deployNotes) {
-			if (!note.resolved) {
-				map.set(note.id, seq++);
-			}
-		}
-		return map;
-	}, [deployNotes]);
-}
-
 export default function ReviewPopoverList() {
 	const { toggleResolve } = useReviewPopoverActions();
 	const {
@@ -41,7 +27,6 @@ export default function ReviewPopoverList() {
 		stats,
 	} = useReviewPopoverData();
 
-	const badgeNumbers = useBadgeNumbers(deployNotes);
 	let itemIndex = 0;
 
 	return (
@@ -68,10 +53,9 @@ export default function ReviewPopoverList() {
 									className="animate-panel-item-in"
 									style={itemStyle}
 								>
-									<TriageCommentCard
-										note={note}
-										badgeNumber={badgeNumbers.get(note.id) ?? null}
-										onToggleResolve={toggleResolve}
+								<TriageCommentCard
+									note={note}
+									onToggleResolve={toggleResolve}
 										data-focused={isFocused || undefined}
 										className={cn(
 											"mx-2",

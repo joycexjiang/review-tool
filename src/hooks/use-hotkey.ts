@@ -42,27 +42,26 @@ export function useHotkey(
 				return;
 			}
 
-			const keyboardEvent = event;
-			if (keyboardEvent.key.toLowerCase() !== normalizedKey) {return;}
-			if (!matchesModifier(shiftKey, keyboardEvent.shiftKey)) {return;}
-			if (!matchesModifier(altKey, keyboardEvent.altKey)) {return;}
-			if (!matchesModifier(metaKey, keyboardEvent.metaKey)) {return;}
-			if (!matchesModifier(ctrlKey, keyboardEvent.ctrlKey)) {return;}
+			if (event.key.toLowerCase() !== normalizedKey) {return;}
+			if (!matchesModifier(shiftKey, event.shiftKey)) {return;}
+			if (!matchesModifier(altKey, event.altKey)) {return;}
+			if (!matchesModifier(metaKey, event.metaKey)) {return;}
+			if (!matchesModifier(ctrlKey, event.ctrlKey)) {return;}
 			if (
 				metaOrCtrl !== undefined &&
-				(keyboardEvent.metaKey || keyboardEvent.ctrlKey) !== metaOrCtrl
+				(event.metaKey || event.ctrlKey) !== metaOrCtrl
 			) {
 				return;
 			}
 
 			if (preventDefault) {
-				keyboardEvent.preventDefault();
+				event.preventDefault();
 			}
 			if (stopPropagation) {
-				keyboardEvent.stopPropagation();
+				event.stopPropagation();
 			}
 
-			handler(keyboardEvent);
+			handler(event);
 		},
 		undefined,
 		enabled,

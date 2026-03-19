@@ -21,7 +21,7 @@ export default function ProgressBar({ resolved, total }: ProgressBarProps) {
 			<Progress.Track className="h-1 flex-1 overflow-hidden rounded-full bg-zinc-200/60">
 				<Progress.Indicator
 					className={cn(
-						"block h-full rounded-full transition-all duration-500",
+						"block h-full rounded-full transition-[width,background-color] duration-300",
 						isComplete ? "bg-emerald-500" : "bg-zinc-900",
 					)}
 				/>

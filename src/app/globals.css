@@ -62,8 +62,10 @@
 	color: #fff;
 }
 
-.ui-toolbar-toggle:hover {
-	background-color: #5d5d5d;
+@media (hover: hover) and (pointer: fine) {
+	.ui-toolbar-toggle:hover {
+		background-color: #5d5d5d;
+	}
 }
 
 .ui-toolbar-toggle-active {

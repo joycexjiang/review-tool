@@ -15,7 +15,6 @@ export default function CommentCardFooter({
 	onCopy,
 	onToggleResolve,
 }: {
-	badgeNumber: number | null;
 	copied: boolean;
 	noteId: string;
 	resolved: boolean;

@@ -28,7 +28,9 @@ export function useClipboardCopy({
 
 	const copy = useCallback(
 		async (value: string) => {
-			if (!value) {return false;}
+			if (!value) {
+				return false;
+			}
 
 			try {
 				await navigator.clipboard.writeText(value);

@@ -31,6 +31,3 @@ export function isDeployAtOrBefore(
 	return DEPLOY_RANK[deploy] <= DEPLOY_RANK[reference];
 }
 
-export function getActiveDeploy(): Deploy {
-	return deploys[deploys.length - 1];
-}

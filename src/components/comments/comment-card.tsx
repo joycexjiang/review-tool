@@ -14,13 +14,11 @@ import {
 
 interface TriageCommentCardProps extends ComponentPropsWithoutRef<"article"> {
 	note: NoteView;
-	badgeNumber: number | null;
 	onToggleResolve: (id: string) => void;
 }
 
 export default function TriageCommentCard({
 	note,
-	badgeNumber,
 	onToggleResolve,
 	className,
 	...props
@@ -69,7 +67,6 @@ export default function TriageCommentCard({
 			</p>
 
 			<CommentCardFooter
-				badgeNumber={badgeNumber}
 				copied={copied}
 				noteId={note.id}
 				resolved={note.resolved}
