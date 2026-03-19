@@ -10,7 +10,7 @@ export default function BadgesToggleButton() {
 	const { numberBadgesVisible } = useToolbarData();
 
 	return (
-		<Tooltip label="Comment badges (⌘B)">
+		<Tooltip label="Comment badges (⌘S)">
 			<Button
 				size="icon"
 				onClick={toggleNumberBadges}
