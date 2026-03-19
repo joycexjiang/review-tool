@@ -1,37 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Review Triage
 
-## Getting Started
+A design feedback tool for preview deployments. Inspect elements, leave comments, and track issues across deploys — all in the browser.
 
-First, run the development server:
+Built with Next.js 16, React 19, TypeScript, and Tailwind CSS v4. No backend or database; all data is mock data for demonstration.
+
+## Features
+
+- **Element inspector** — Toggle inspect mode, hover to highlight elements, click to open a popover with element info (tag, classes, CSS selector, source file) and a form to add comments with type and severity.
+- **Review panel** — Side panel (drawer or floating) to browse comments by deploy version, filter by type (bug, suggestion, question), track resolution progress, and open "Fix with" links to external tools (Cursor, v0, Conductor, Replit).
+- **Number badges** — Overlay badges on elements that have comments, with counts and hover previews.
+- **Floating toolbar** — Quick toggles for inspect mode, badges, and the review panel.
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Task | Command |
+| --- | --- |
+| Dev server | `npm run dev` |
+| Lint | `npm run lint` |
+| Build | `npm run build` |
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/                # Next.js App Router (layout, page, global styles)
+├── components/
+│   ├── comments/       # Comment cards, number badges, severity
+│   ├── demo/           # Demo pricing page used as preview content
+│   ├── inspector/      # Element inspection, hover overlay, comment form
+│   ├── review-popover/ # Review panel (drawer/floating, filters, progress)
+│   └── toolbar/        # Floating toolbar
+├── hooks/              # Shared hooks (hotkeys, clipboard, viewport, etc.)
+├── lib/                # Utilities
+├── mock/               # Mock deploys, comments, and fix-with targets
+├── types/              # Shared TypeScript types
+└── ui/                 # UI primitives and icons (Base UI / ShadCN style)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Category | Library |
+| --- | --- |
+| Framework | [Next.js 16](https://nextjs.org) + [React 19](https://react.dev) |
+| Styling | [Tailwind CSS v4](https://tailwindcss.com) |
+| UI primitives | [@base-ui/react](https://base-ui.com) |
+| Animation | [Motion](https://motion.dev) |
+| Toasts | [Sonner](https://sonner.emilkowal.ski) |
+| Compiler | [React Compiler](https://react.dev/learn/react-compiler) |
+| Fonts | [Geist](https://vercel.com/font) via `next/font` |
 
