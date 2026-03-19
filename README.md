@@ -1,6 +1,6 @@
 # Review Triage
 
-A design feedback tool for preview deployments. Inspect elements, leave comments, and track issues across deploys — all in the browser.
+A design feedback tool for preview deployments. Inspect elements, leave comments, and track issues across deploys all in the browser.
 
 Built with Next.js 16, React 19, TypeScript, and Tailwind CSS v4. No backend or database; all data is mock data for demonstration.
 
