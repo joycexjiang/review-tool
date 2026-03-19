@@ -16,9 +16,9 @@ export default function InspectToggleButton() {
 				onClick={toggleInspectMode}
 				aria-pressed={inspectMode}
 				aria-label={inspectMode ? "Stop inspecting" : "Inspect elements"}
-				className={`size-8 shrink-0 overflow-hidden rounded-full! p-0 ${
+				className={`size-8 shrink-0 overflow-hidden rounded-full! p-0 text-white enabled:hover:text-white ${
 					inspectMode
-						? "ui-review-accent-bg text-white hover:opacity-95"
+						? "ui-review-accent-bg hover:opacity-95"
 						: "ui-toolbar-toggle"
 				}`}
 			>

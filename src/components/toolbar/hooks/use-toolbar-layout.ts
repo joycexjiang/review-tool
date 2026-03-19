@@ -6,48 +6,20 @@ import { useDockedFloatingPosition } from "@/hooks/use-docked-floating-position"
 import { useViewportSize } from "@/hooks/use-viewport-size";
 import type { ToolbarLayoutValue } from "../toolbar-context";
 
-const REVIEW_POPOVER_EDGE_MARGIN = 12;
 const TOOLBAR_DEFAULT_BOTTOM = 20;
 const TOOLBAR_DEFAULT_HEIGHT = 42;
-const REVIEW_POPOVER_FLOATING_HEIGHT = Math.round((420 * 576) / 640);
-
-function getFloatingPanelHeight(viewportHeight: number | null) {
-	if (viewportHeight === null) {
-		return REVIEW_POPOVER_FLOATING_HEIGHT;
-	}
-
-	return Math.min(
-		REVIEW_POPOVER_FLOATING_HEIGHT,
-		viewportHeight - REVIEW_POPOVER_EDGE_MARGIN * 2,
-	);
-}
-
-function getDefaultFloatingPanelTop(
-	floatingPanelHeight: number,
-	viewportHeight: number | null,
-) {
-	if (viewportHeight === null) {
-		return REVIEW_POPOVER_EDGE_MARGIN;
-	}
-
-	return Math.max(
-		REVIEW_POPOVER_EDGE_MARGIN,
-		Math.min(
-			viewportHeight - floatingPanelHeight - REVIEW_POPOVER_EDGE_MARGIN,
-			viewportHeight / 2 - floatingPanelHeight / 2,
-		),
-	);
-}
 
 interface UseToolbarLayoutOptions {
 	panelMode: "floating" | "drawer";
 	panelOpen: boolean;
 	toolbarHeight: number;
 	toolbarSide: ToolbarSide;
+	toolbarX: number | null;
 	toolbarY: number | null;
 	setToolbarHeight: (height: number) => void;
 	setToolbarSide: (side: ToolbarSide) => void;
 	setToolbarWidth: (width: number) => void;
+	setToolbarX: (x: number | null) => void;
 	setToolbarY: (y: number | null) => void;
 }
 
@@ -56,10 +28,12 @@ export function useToolbarLayout({
 	panelOpen,
 	toolbarHeight,
 	toolbarSide,
+	toolbarX,
 	toolbarY,
 	setToolbarHeight,
 	setToolbarSide,
 	setToolbarWidth,
+	setToolbarX,
 	setToolbarY,
 }: UseToolbarLayoutOptions): ToolbarLayoutValue {
 	const viewportSize = useViewportSize();
@@ -75,6 +49,7 @@ export function useToolbarLayout({
 		handlePointerUp,
 	} = useDockedFloatingPosition({
 		side: toolbarSide,
+		x: toolbarX,
 		y: toolbarY,
 		viewportHeight,
 		viewportWidth,
@@ -82,16 +57,17 @@ export function useToolbarLayout({
 		onHeightChange: setToolbarHeight,
 		onSideChange: setToolbarSide,
 		onWidthChange: setToolbarWidth,
+		onXChange: setToolbarX,
 		onYChange: setToolbarY,
 		canStartDrag: (target) => !target.closest("button"),
 	});
 
+	const isHorizontalEdge =
+		toolbarSide === "top" || toolbarSide === "bottom";
+
 	return useMemo(() => {
 		const resolvedToolbarHeight = toolbarHeight || TOOLBAR_DEFAULT_HEIGHT;
-		const floatingPanelHeight = getFloatingPanelHeight(viewportHeight);
-		const defaultFloatingToolbarTop =
-			getDefaultFloatingPanelTop(floatingPanelHeight, viewportHeight) +
-			(floatingPanelHeight - resolvedToolbarHeight) / 2;
+		const defaultFloatingToolbarTop = `calc(50vh - ${resolvedToolbarHeight / 2}px)`;
 
 		return {
 			elementRef,
@@ -110,13 +86,14 @@ export function useToolbarLayout({
 						transition:
 							"left 300ms cubic-bezier(0.22,1,0.36,1), transform 300ms cubic-bezier(0.22,1,0.36,1)",
 					}
-				: toolbarY === null
+				: toolbarY === null && !isHorizontalEdge
 					? {
 							...positionStyle,
 							top: defaultFloatingToolbarTop,
 							bottom: "auto",
 						}
 					: positionStyle,
+			toolbarSide,
 		};
 	}, [
 		elementRef,
@@ -125,9 +102,10 @@ export function useToolbarLayout({
 		handlePointerMove,
 		handlePointerUp,
 		isDrawerOpen,
+		isHorizontalEdge,
 		positionStyle,
 		toolbarHeight,
+		toolbarSide,
 		toolbarY,
-		viewportHeight,
 	]);
 }

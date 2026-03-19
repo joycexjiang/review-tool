@@ -14,15 +14,24 @@ import type { ToolbarActionsValue, ToolbarDataValue } from "../toolbar-context";
 import { useToolbarLayout } from "./use-toolbar-layout";
 
 export function useToolbarController() {
-	const { inspection, reviewPopover, toolbarHeight, toolbarSide, toolbarY } =
-		useInspectorState();
+	const {
+		inspection,
+		reviewPopover,
+		toolbarHeight,
+		toolbarSide,
+		toolbarX,
+		toolbarY,
+		numberBadgesVisible,
+	} = useInspectorState();
 	const {
 		setToolbarHeight,
 		setToolbarSide,
 		setToolbarWidth,
+		setToolbarX,
 		setToolbarY,
 		toggleInspectMode,
 		togglePanel,
+		toggleNumberBadges,
 	} = useInspectorActions();
 	const inspectMode = isInspectMode(inspection);
 	const panelMode = getPanelMode(reviewPopover);
@@ -33,9 +42,11 @@ export function useToolbarController() {
 		setToolbarHeight,
 		setToolbarSide,
 		setToolbarWidth,
+		setToolbarX,
 		setToolbarY,
 		toolbarHeight,
 		toolbarSide,
+		toolbarX,
 		toolbarY,
 	});
 
@@ -43,16 +54,18 @@ export function useToolbarController() {
 		() => ({
 			inspectMode,
 			panelOpen,
+			numberBadgesVisible,
 		}),
-		[inspectMode, panelOpen],
+		[inspectMode, panelOpen, numberBadgesVisible],
 	);
 
 	const actions = useMemo<ToolbarActionsValue>(
 		() => ({
 			toggleInspectMode,
 			togglePanel,
+			toggleNumberBadges,
 		}),
-		[toggleInspectMode, togglePanel],
+		[toggleInspectMode, togglePanel, toggleNumberBadges],
 	);
 
 	return { actions, data, layout };

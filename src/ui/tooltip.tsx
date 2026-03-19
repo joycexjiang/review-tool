@@ -21,7 +21,7 @@ function TooltipProvider({ children, ...props }: TooltipProviderProps) {
 function Tooltip({
 	label,
 	side = "bottom",
-	sideOffset = 6,
+	sideOffset = 16,
 	children,
 	className,
 }: TooltipProps) {
@@ -32,11 +32,11 @@ function Tooltip({
 				<BaseTooltip.Positioner
 					side={side}
 					sideOffset={sideOffset}
-					className="z-10001 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) outline-none"
+					className="z-10010 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) outline-none"
 				>
 					<BaseTooltip.Popup
 						className={cn(
-							"relative flex flex-col rounded-md bg-zinc-900 px-2 py-1 text-sm font-medium text-white origin-(--transform-origin) shadow-lg shadow-zinc-950/15 transition-[transform,opacity] data-ending-style:scale-90 data-ending-style:opacity-0 data-instant:transition-none data-starting-style:scale-90 data-starting-style:opacity-0",
+							"relative flex flex-col rounded-md bg-zinc-900 px-2 py-1 text-xs font-medium text-white origin-(--transform-origin) shadow-lg shadow-zinc-950/15 transition-[transform,opacity] data-ending-style:scale-95 data-ending-style:opacity-0 data-instant:transition-none data-starting-style:scale-95 data-starting-style:opacity-0",
 							className,
 						)}
 					>

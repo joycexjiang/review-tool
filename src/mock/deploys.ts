@@ -2,18 +2,18 @@ import type { Deploy, DeployVersion } from "@/types";
 
 export const deploys: Deploy[] = [
 	{
-		id: "deploy-1",
-		version: "v1",
-		label: "v1 · Mar 15",
-		timestamp: Date.UTC(2026, 2, 15, 14, 30, 0),
-		status: "superseded",
-	},
-	{
 		id: "deploy-2",
 		version: "v2",
 		label: "v2 · Mar 16",
 		timestamp: Date.UTC(2026, 2, 16, 11, 0, 0),
 		status: "active",
+	},
+	{
+		id: "deploy-1",
+		version: "v1",
+		label: "v1 · Mar 15",
+		timestamp: Date.UTC(2026, 2, 15, 14, 30, 0),
+		status: "superseded",
 	},
 ];
 

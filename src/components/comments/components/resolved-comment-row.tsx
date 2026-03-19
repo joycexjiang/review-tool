@@ -1,11 +1,7 @@
 "use client";
 
-import {
-	isFixedInDeployNote,
-	type NoteView,
-} from "@/components/inspector/lib/note-view-types";
+import type { NoteView } from "@/components/inspector/lib/note-view-types";
 import { cn } from "@/lib/utils";
-import CheckIcon from "@/ui/icons/check";
 
 export default function ResolvedCommentRow({
 	className,
@@ -29,15 +25,9 @@ export default function ResolvedCommentRow({
 			onMouseLeave={onMouseLeave}
 			{...props}
 		>
-			<CheckIcon className="size-3.5 shrink-0 text-emerald-400" />
 			<p className="min-w-0 flex-1 truncate text-[13px] text-zinc-400 line-through decoration-zinc-300">
 				{note.text}
 			</p>
-			{isFixedInDeployNote(note) ? (
-				<span className="shrink-0 text-[11px] text-zinc-400">
-					{note.status.deploy}
-				</span>
-			) : null}
 			<button
 				type="button"
 				onClick={onExpand}

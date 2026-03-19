@@ -21,7 +21,6 @@ export interface ReviewPopoverDataValue {
 }
 
 export interface ReviewPopoverActionsValue {
-	clearHighlightedNote: () => void;
 	close: () => void;
 	copyAll: () => void;
 	toggleMode: () => void;

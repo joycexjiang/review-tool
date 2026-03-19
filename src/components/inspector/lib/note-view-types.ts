@@ -20,17 +20,12 @@ export interface ReviewStats {
 	major: number;
 	minor: number;
 	fixedInDeploy: number;
-	newInDeploy: number;
 }
 
 export function isResolvedNote(note: NoteView): boolean {
 	return (
 		note.status.type === "resolved" || note.status.type === "fixed-in-deploy"
 	);
-}
-
-export function isNewNote(note: NoteView): boolean {
-	return note.status.type === "new";
 }
 
 export function isFixedInDeployNote(note: NoteView): note is NoteView & {

@@ -34,7 +34,6 @@ export default function FloatingShell({
 				...floatingPositionStyle,
 				top: floatingTop,
 				width: floatingWidth,
-				opacity: panelOpen ? 1 : 0,
 				transition: isDragging ? "none" : floatingTransition,
 			}}
 		>

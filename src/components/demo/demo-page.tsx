@@ -58,14 +58,14 @@ export default function DemoPage() {
 	const multiplier = billing === "annual" ? 0.8 : 1;
 
 	return (
-		<div data-demo-page className="min-h-screen bg-white select-none">
+		<div data-demo-page className="min-h-screen bg-zinc-50 select-none">
 			<div
 				data-note="hero-section"
 				className="mx-auto max-w-[1080px] px-6 pb-24 pt-16"
 			>
 				<PricingHero billing={billing} onBillingChange={setBilling} />
 
-				<div className="mb-24 grid grid-cols-1 gap-5 md:grid-cols-3">
+				<div className="grid grid-cols-1 gap-5 md:grid-cols-3">
 					{plans.map((plan) => {
 						const price = Math.round(plan.price * multiplier);
 

@@ -16,7 +16,11 @@ export default function ToolbarShell({
 		onPointerMove,
 		onPointerUp,
 		style,
+		toolbarSide,
 	} = useToolbarLayoutContext();
+
+	const isVertical =
+		!isDrawerOpen && (toolbarSide === "left" || toolbarSide === "right");
 
 	return (
 		<div
@@ -28,7 +32,8 @@ export default function ToolbarShell({
 			onPointerUp={onPointerUp}
 			onPointerCancel={onPointerCancel}
 			className={cn(
-				"fixed z-10003 flex select-none items-center gap-1 rounded-full border border-primary bg-primary p-1 shadow-sm inset-border-secondary backdrop-blur",
+				"fixed z-10003 flex select-none items-center gap-1 rounded-full p-1 shadow-sm backdrop-blur ui-toolbar-shell",
+				isVertical && "flex-col",
 				isDrawerOpen ? "" : "cursor-grab active:cursor-grabbing",
 			)}
 		>

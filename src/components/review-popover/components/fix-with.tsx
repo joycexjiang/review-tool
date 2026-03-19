@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback } from "react";
-import { cn } from "@/lib/utils";
 import {
 	type FixWithTarget,
 	type FixWithTargetId,
@@ -33,12 +32,16 @@ export default function FixWithMenu({ prompt }: FixWithMenuProps) {
 
 	const handleSelectTarget = useCallback(
 		(targetId: FixWithTargetId) => {
-			if (!hasMeaningfulPrompt) {return;}
+			if (!hasMeaningfulPrompt) {
+				return;
+			}
 
 			const target = fixWithTargets.find((item) => item.id === targetId);
-			if (!target) {return;}
+			if (!target) {
+				return;
+			}
 
-			if (target.status !== "ready" || !target.hrefPrefix) {
+			if (!target.hrefPrefix) {
 				toast.message(
 					`${target.label} handoff is shown in the demo, but not wired yet.`,
 				);
@@ -56,17 +59,15 @@ export default function FixWithMenu({ prompt }: FixWithMenuProps) {
 		<DropdownMenu
 			side="bottom"
 			align="end"
-			className="min-w-44"
+			className="min-w-44 text-zinc-500"
 			trigger={
 				<Button
-					size="sm"
+					variant="ghost"
 					disabled={!hasMeaningfulPrompt}
-					className="gap-1.5 border border-primary pr-1.5 text-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
+					className="rounded-lg px-3"
 				>
 					Fix with
-					<span className="[&_svg]:size-3.5 [&_svg]:shrink-0">
-						<ChevronDownIcon />
-					</span>
+					<ChevronDownIcon className="size-2.5" />
 				</Button>
 			}
 		>
@@ -82,11 +83,6 @@ export default function FixWithMenu({ prompt }: FixWithMenuProps) {
 							{target.label}
 						</span>
 					</span>
-					{target.status === "planned" ? (
-						<span className="text-xs font-medium uppercase tracking-wider text-zinc-400">
-							Soon
-						</span>
-					) : null}
 				</DropdownItem>
 			))}
 		</DropdownMenu>
@@ -97,12 +93,7 @@ function FixWithIcon({ target }: { target: FixWithTarget }) {
 	const Icon = FIX_WITH_ICONS[target.id];
 
 	return (
-		<span
-			className={cn(
-				"text-zinc-500 [&_svg]:size-4 [&_svg]:shrink-0",
-				target.status === "planned" && "text-zinc-400",
-			)}
-		>
+		<span className="text-zinc-500 [&_svg]:size-4 [&_svg]:shrink-0">
 			<Icon />
 		</span>
 	);

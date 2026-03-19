@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/ui/button";
+import { IconTransition } from "@/ui/icon-transition";
 import CheckIcon from "@/ui/icons/check";
 import CopyIcon from "@/ui/icons/copy";
 import { Tooltip } from "@/ui/tooltip";
@@ -30,7 +31,7 @@ export default function CopyableCodeSnippet({
 }: CopyableCodeSnippetProps) {
 	return (
 		<div className="mb-3">
-			<div className="mb-1 text-xs font-mono font-medium uppercase tracking-tight text-section-label">
+			<div className="mb-1 text-[10px] font-mono uppercase text-zinc-400">
 				{label}
 			</div>
 			<div className="group relative">
@@ -47,17 +48,19 @@ export default function CopyableCodeSnippet({
 						size="icon-sm"
 						onClick={onCopy}
 						aria-label={copied ? copiedLabel : ariaLabel}
-						className={`absolute right-1 top-1 rounded p-0.5 shadow-sm transition-all ${
+						className={`absolute right-1 top-1 rounded p-0.5 shadow-sm transition-opacity duration-150 ${
 							copied
 								? "bg-emerald-50 text-emerald-600 opacity-100"
 								: "bg-white text-zinc-400 opacity-0 hover:text-zinc-600 group-hover:opacity-100"
 						}`}
 					>
-						{copied ? (
-							<CheckIcon className="size-4" />
-						) : (
-							<CopyIcon className="size-4" />
-						)}
+						<IconTransition activeKey={copied ? "check" : "copy"}>
+							{copied ? (
+								<CheckIcon className="size-4" />
+							) : (
+								<CopyIcon className="size-4" />
+							)}
+						</IconTransition>
 					</Button>
 				</Tooltip>
 			</div>

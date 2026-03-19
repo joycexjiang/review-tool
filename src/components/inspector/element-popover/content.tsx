@@ -1,7 +1,6 @@
 "use client";
 
 import { ScrollArea } from "@base-ui/react/scroll-area";
-import { Separator } from "@base-ui/react/separator";
 import type { ReactNode, RefObject } from "react";
 import {
 	type HighlightRect,
@@ -22,6 +21,24 @@ import BoxModel from "./components/box-model";
 import CommentForm from "./components/comment-form";
 import CopyableCodeSnippet from "./components/copyable-code-snippet";
 
+const POPOVER_WIDTH = 340;
+
+/** Origin-aware transform-origin: popover scales from its anchor (the highlighted rect) */
+function getPopoverTransformOrigin(
+	rect: HighlightRect,
+	layout: PopoverLayout | null,
+): string {
+	const popoverLeft = layout?.left ?? rect.left;
+	const popoverTop = layout?.top ?? rect.top + rect.height + POPOVER_OFFSET;
+	const rectCenterX = rect.left + rect.width / 2;
+	const rectCenterY = rect.top + rect.height / 2;
+	const originX = Math.round(
+		Math.max(0, Math.min(POPOVER_WIDTH, rectCenterX - popoverLeft)),
+	);
+	const originY = Math.round(Math.max(0, rectCenterY - popoverTop));
+	return `${originX}px ${originY}px`;
+}
+
 interface ElementPopoverContentProps {
 	popoverRef: RefObject<HTMLDivElement | null>;
 	titleId: string;
@@ -38,7 +55,7 @@ interface ElementPopoverContentProps {
 
 function SectionLabel({ children }: { children: ReactNode }) {
 	return (
-		<div className="mb-1 text-xs font-mono font-medium uppercase tracking-tight text-section-label">
+		<div className="mb-1.5 text-[10px] font-mono uppercase text-zinc-400">
 			{children}
 		</div>
 	);
@@ -66,10 +83,10 @@ export default function ElementPopoverContent({
 		? elementInfo.className.split(/\s+/).filter(Boolean).slice(0, 8)
 		: [];
 
+	const transformOrigin = getPopoverTransformOrigin(rect, layout);
+
 	return (
 		<>
-			<div className="fixed inset-0 z-9999" onClick={onClose} aria-hidden />
-
 			<div
 				data-inspector-overlay
 				className="pointer-events-none fixed z-9998"
@@ -80,7 +97,7 @@ export default function ElementPopoverContent({
 					height: rect.height,
 				}}
 			>
-				<div className="h-full w-full rounded-[2px] border-2 border-blue-600 bg-blue-500/15" />
+				<div className="h-full w-full rounded-[3px] border-2 border-blue-500/90 bg-blue-500/12 shadow-[0_0_0_1px_rgba(59,130,246,0.2)]" />
 			</div>
 
 			<div
@@ -90,19 +107,20 @@ export default function ElementPopoverContent({
 				aria-modal="true"
 				aria-labelledby={titleId}
 				tabIndex={-1}
-				className={`fixed z-10000 w-[340px] overflow-hidden rounded-lg border border-primary bg-primary shadow-xl transition-opacity duration-100 ${
+				className={`fixed z-10000 w-[340px] overflow-hidden rounded-xl border border-primary bg-primary shadow-[0_4px_6px_-1px_rgba(0,0,0,0.08),0_10px_20px_-2px_rgba(0,0,0,0.06)] transition-opacity duration-100 ${
 					layout ? "animate-popover-in opacity-100" : "opacity-0"
 				}`}
 				style={{
 					top: layout?.top ?? rect.top + rect.height + POPOVER_OFFSET,
 					left: layout?.left ?? rect.left,
+					transformOrigin,
 				}}
 			>
 				<Tabs
 					defaultValue="comment"
 					className="flex max-h-[70vh] min-h-0 flex-col"
 				>
-					<div className="flex shrink-0 items-start justify-between p-4 pb-3">
+					<div className="flex shrink-0 items-start justify-between p-4 pb-2 border-b border-zinc-200">
 						<div>
 							<h2
 								id={titleId}
@@ -110,9 +128,14 @@ export default function ElementPopoverContent({
 							>
 								&lt;{tag}&gt;
 							</h2>
-							<div className="mt-1 text-xs text-element-size">
+							<div className="mt-1.5 font-mono text-xs tabular-nums text-element-size">
 								{Math.round(rect.width)} &times; {Math.round(rect.height)}
 							</div>
+							{sourceLabel ? (
+								<code className="mt-3 inline-block max-w-full truncate rounded bg-white px-1 py-0.5 font-mono text-[10px] text-zinc-500 ring-1 ring-zinc-300/80">
+									{sourceLabel}
+								</code>
+							) : null}
 						</div>
 						<Button
 							size="icon-sm"
@@ -122,30 +145,30 @@ export default function ElementPopoverContent({
 							<XMarkIcon className="size-4" />
 						</Button>
 					</div>
-					<div className="px-4 pb-3">
-						<TabsList aria-label="Inspector view">
-							<TabsTrigger value="comment">Comment</TabsTrigger>
-							<TabsTrigger value="info">Info</TabsTrigger>
-							<TabsIndicator />
+					<div className="px-4 my-3 pb-0">
+						<TabsList
+							className="gap-1 rounded-full bg-transparent p-0"
+							aria-label="Inspector view"
+						>
+							<TabsTrigger
+								value="comment"
+								className="h-auto rounded-full px-2.5 py-1.5 text-xs font-medium"
+							>
+								Comment
+							</TabsTrigger>
+							<TabsTrigger
+								value="info"
+								className="h-auto rounded-full px-2.5 py-1.5 text-xs font-medium"
+							>
+								Info
+							</TabsTrigger>
+							<TabsIndicator className="rounded-full" />
 						</TabsList>
 					</div>
 					<ScrollArea.Root className="relative min-h-0 flex-1">
 						<ScrollArea.Viewport className="h-full">
-							<ScrollArea.Content className="px-4 pb-4">
+							<ScrollArea.Content className="px-3.5 pb-2">
 								<TabsContent value="comment">
-									{sourceLabel ? (
-										<CopyableCodeSnippet
-											label="Source"
-											value={sourceLabel}
-											copied={sourceCopied}
-											onCopy={onCopySource}
-											copyLabel="Copy source"
-											copiedLabel="Copied"
-											ariaLabel="Copy source file"
-											codeClassName="text-sourcefile"
-										/>
-									) : null}
-									<Separator className="my-3" />
 									<CommentForm onSubmit={onSubmit} />
 								</TabsContent>
 

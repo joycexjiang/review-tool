@@ -100,10 +100,10 @@ export default function PricingCard({ plan, price }: PricingCardProps) {
 				</p>
 			</div>
 
-			<div className="mb-8">
+			<div className="mb-6">
 				<span
 					data-note={getPriceNoteAttr(plan.name)}
-					className={`font-semibold tracking-tight text-zinc-950 ${
+					className={`font-semibold tabular-nums tracking-tight text-zinc-950 ${
 						plan.name === "Hobby" ? "text-4xl" : "text-5xl"
 					}`}
 				>
@@ -122,7 +122,7 @@ export default function PricingCard({ plan, price }: PricingCardProps) {
 			<button
 				type="button"
 				data-note={getCtaNoteAttr(plan.name)}
-				className={`group mb-8 flex w-full items-center justify-center py-2.5 text-[13px] font-medium transition-all duration-150 ${
+				className={`group mb-8 flex w-full items-center justify-center py-2.5 text-[13px] font-medium transition-[background-color,color,transform] duration-150 ${
 					isPopular
 						? "rounded-md bg-zinc-950 text-white hover:bg-zinc-800 active:scale-[0.98]"
 						: plan.name === "Enterprise"

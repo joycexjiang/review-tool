@@ -1,73 +1,39 @@
 "use client";
 
-interface ProgressRingProps {
+import { Progress } from "@base-ui/react/progress";
+import { cn } from "@/lib/utils";
+
+interface ProgressBarProps {
 	resolved: number;
 	total: number;
-	size?: number;
 }
 
-export default function ProgressRing({
-	resolved,
-	total,
-	size = 32,
-}: ProgressRingProps) {
-	const strokeWidth = 2.5;
-	const radius = (size - strokeWidth) / 2;
-	const circumference = 2 * Math.PI * radius;
-	const progress = total > 0 ? resolved / total : 0;
-	const offset = circumference * (1 - progress);
+export default function ProgressBar({ resolved, total }: ProgressBarProps) {
+	const percentage = total > 0 ? (resolved / total) * 100 : 0;
 	const isComplete = total > 0 && resolved === total;
 
 	return (
-		<div
-			className="relative shrink-0"
-			style={{ width: size, height: size }}
-			role="progressbar"
-			aria-valuenow={resolved}
-			aria-valuemin={0}
-			aria-valuemax={total}
+		<Progress.Root
+			value={percentage}
 			aria-label={`${resolved} of ${total} resolved`}
+			className="flex items-center gap-2.5 px-1"
 		>
-			<svg
-				width={size}
-				height={size}
-				className="-rotate-90"
-				viewBox={`0 0 ${size} ${size}`}
-				aria-hidden="true"
-			>
-				<circle
-					cx={size / 2}
-					cy={size / 2}
-					r={radius}
-					fill="none"
-					stroke="currentColor"
-					strokeWidth={strokeWidth}
-					className="text-zinc-100"
+			<Progress.Track className="h-1 flex-1 overflow-hidden rounded-full bg-zinc-200/60">
+				<Progress.Indicator
+					className={cn(
+						"block h-full rounded-full transition-all duration-500",
+						isComplete ? "bg-emerald-500" : "bg-zinc-900",
+					)}
 				/>
-				{total > 0 && (
-					<circle
-						cx={size / 2}
-						cy={size / 2}
-						r={radius}
-						fill="none"
-						stroke="currentColor"
-						strokeWidth={strokeWidth}
-						strokeLinecap="round"
-						strokeDasharray={circumference}
-						strokeDashoffset={offset}
-						className={`transition-all duration-500 ease-out ${
-							isComplete ? "text-emerald-500" : "text-zinc-900"
-						}`}
-					/>
-				)}
-			</svg>
+			</Progress.Track>
 			<span
-				className={`absolute inset-0 flex items-center justify-center text-[10px] font-semibold tabular-nums ${
-					isComplete ? "text-emerald-600" : "text-zinc-700"
-				}`}
+				className={cn(
+					"shrink-0 text-[11px] font-medium tabular-nums",
+					isComplete ? "text-emerald-600" : "text-zinc-500",
+				)}
 			>
 				{resolved}/{total}
 			</span>
-		</div>
+		</Progress.Root>
 	);
 }

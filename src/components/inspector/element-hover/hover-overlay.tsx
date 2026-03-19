@@ -74,7 +74,7 @@ export default function HoverOverlay() {
 			{tooltip && (
 				<div
 					data-inspector-tooltip
-					className="pointer-events-none fixed z-9999 rounded-md bg-primary px-2.5 py-1.5 shadow-lg"
+					className="pointer-events-none fixed z-9999 rounded-md bg-[#313131] px-2.5 py-1.5 shadow-lg "
 					style={{
 						top: tooltip.top - window.scrollY,
 						left: tooltip.left - window.scrollX,

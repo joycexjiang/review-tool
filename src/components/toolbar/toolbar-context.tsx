@@ -5,11 +5,13 @@ import { createContext, useContext } from "react";
 export interface ToolbarDataValue {
 	inspectMode: boolean;
 	panelOpen: boolean;
+	numberBadgesVisible: boolean;
 }
 
 export interface ToolbarActionsValue {
 	toggleInspectMode: () => void;
 	togglePanel: () => void;
+	toggleNumberBadges: () => void;
 }
 
 export interface ToolbarLayoutValue {
@@ -20,6 +22,7 @@ export interface ToolbarLayoutValue {
 	onPointerMove?: React.PointerEventHandler<HTMLDivElement>;
 	onPointerUp?: React.PointerEventHandler<HTMLDivElement>;
 	style: React.CSSProperties;
+	toolbarSide: "left" | "right" | "top" | "bottom";
 }
 
 const ToolbarDataContext = createContext<ToolbarDataValue | null>(null);

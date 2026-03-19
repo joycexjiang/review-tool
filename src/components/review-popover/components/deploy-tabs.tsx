@@ -27,11 +27,11 @@ export default function DeployTabs() {
 						role="tab"
 						aria-selected={isActive}
 						onClick={() => setActiveDeploy(deploy.version)}
-						className={`rounded-full px-2.5 py-[5px] text-[11px] font-medium transition-all duration-200 ${
-							isActive
-								? "bg-white text-zinc-900 shadow-sm"
-								: "text-zinc-400 hover:text-zinc-600"
-						}`}
+						className={`rounded-full px-2.5 py-[5px] text-[11px] font-medium ${
+						isActive
+							? "bg-white text-zinc-900 shadow-sm"
+							: "text-zinc-400 hover:text-zinc-600"
+					}`}
 					>
 						{deploy.version}
 					</button>

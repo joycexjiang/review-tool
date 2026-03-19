@@ -65,8 +65,8 @@ export default function NumberBadgeHoverComment({
 						type="button"
 						className={cn(
 							NUMBER_BADGE_CLASS,
-							"pointer-events-auto animate-badge-in cursor-pointer transition-[transform,background-color,color,opacity] duration-150 hover:scale-110",
-							isActive ? "scale-110" : "",
+							"pointer-events-auto cursor-pointer transition-[transform,background-color,color,opacity] duration-150 hover:scale-105",
+							isActive ? "scale-105" : "",
 							isMuted ? "bg-zinc-200! text-white shadow-none" : "",
 						)}
 						onClick={onBadgeClick}
@@ -83,19 +83,10 @@ export default function NumberBadgeHoverComment({
 				initialFocus={false}
 				finalFocus={false}
 			>
-				<article
-					className={cn(
-						"w-80 max-w-[calc(100vw-1rem)] rounded-xl bg-primary px-3.5 py-3 shadow-sm border border-inset border-primary ",
-						entry.note.resolved ? "opacity-75" : "",
-					)}
-				>
+				<article className="w-80 max-w-[calc(100vw-1rem)] rounded-xl bg-white px-3.5 py-3 border border-inset border-zinc-200 shadow-sm">
 					<div className="mb-2 flex items-start gap-2">
 						<div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
-							<span
-								className={cn(
-									"rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ring-1 ring-inset",
-								)}
-							>
+							<span className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ring-1 ring-inset">
 								{TYPE_LABELS[entry.note.type]}
 							</span>
 							<CommentSeverityBadge
@@ -104,11 +95,6 @@ export default function NumberBadgeHoverComment({
 								iconClassName="size-4"
 							/>
 						</div>
-						{entry.note.resolved ? (
-							<span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 ring-1 ring-emerald-200 ring-inset">
-								Resolved
-							</span>
-						) : null}
 					</div>
 
 					<div className="mb-2 flex items-center justify-between gap-3">
@@ -123,25 +109,14 @@ export default function NumberBadgeHoverComment({
 						</span>
 					</div>
 
-					<p
-						className={cn(
-							"text-[13px] leading-relaxed text-zinc-700",
-							entry.note.resolved ? "line-through text-zinc-500" : "",
-						)}
-						style={{ textWrap: "pretty" }}
-					>
+					<p className="text-[13px] leading-relaxed text-zinc-700">
 						{entry.note.text}
 					</p>
 
-					<div className="mt-3 space-y-1">
-						<div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-zinc-400">
-							Source file
-						</div>
-						<CommentSourceCode
-							source={entry.note.elementInfo}
-							className="w-full px-2 py-1 text-zinc-600"
-						/>
-					</div>
+					<CommentSourceCode
+						source={entry.note.elementInfo}
+						className="w-full px-2 py-1 text-zinc-600"
+					/>
 				</article>
 			</PopoverContent>
 		</Popover>

@@ -2,12 +2,14 @@
 
 import { useCallback, useMemo, useRef } from "react";
 import { formatCommentMarkdown } from "@/components/comments/comment-card";
+import { useElementHighlightOverlay } from "@/components/inspector/hooks/use-element-highlight-overlay";
 import {
 	useDeployNotes,
 	useFilteredNotes,
 	useReviewStats,
 	useSortedNotes,
 } from "@/components/inspector/hooks/use-note-views";
+import type { NoteView } from "@/components/inspector/lib/note-view-types";
 import { isResolvedNote } from "@/components/inspector/lib/note-view-types";
 import {
 	useInspectorActions,
@@ -47,6 +49,7 @@ export function useReviewPopoverController() {
 	const {
 		announce,
 		clearHighlightedNote,
+		setActiveNote,
 		togglePanel,
 		togglePanelMode,
 		toggleResolve,
@@ -68,13 +71,43 @@ export function useReviewPopoverController() {
 		() => groupNotesBySeveritySection(sortedNotes),
 		[sortedNotes],
 	);
+	const { showHighlight: showKeyboardHighlight, clearHighlight: clearKeyboardHighlight } =
+		useElementHighlightOverlay();
+
+	const onKeyboardFocusChange = useCallback(
+		(note: NoteView | null) => {
+			clearHighlightedNote();
+			if (note) {
+				setActiveNote(note.id);
+				if (!note.resolved) {
+					void showKeyboardHighlight(note.elementInfo.cssSelector, {
+						variant: "preview",
+					});
+				} else {
+					clearKeyboardHighlight();
+				}
+			} else {
+				setActiveNote(null);
+				clearKeyboardHighlight();
+			}
+		},
+		[clearHighlightedNote, setActiveNote, showKeyboardHighlight, clearKeyboardHighlight],
+	);
+
 	const keyboardNavResetKey = `${activeDeploy}:${filters.type ?? "all"}`;
 	const focusedIndex = useReviewPopoverKeyboardNav(
 		listRef,
 		panelOpen,
 		sortedNotes,
 		keyboardNavResetKey,
+		onKeyboardFocusChange,
 	);
+
+	const closePanel = useCallback(() => {
+		onKeyboardFocusChange(null);
+		togglePanel();
+	}, [onKeyboardFocusChange, togglePanel]);
+
 	const { copied: headerCopied, copy: copyToClipboard } = useClipboardCopy({
 		resetAfterMs: 2000,
 		onSuccess: () => {
@@ -93,7 +126,7 @@ export function useReviewPopoverController() {
 			preventDefault: true,
 		},
 		() => {
-			togglePanel();
+			closePanel();
 			const button = document.querySelector<HTMLElement>("[data-panel-toggle]");
 			button?.focus();
 		},
@@ -139,17 +172,15 @@ export function useReviewPopoverController() {
 
 	const actions = useMemo<ReviewPopoverActionsValue>(
 		() => ({
-			clearHighlightedNote,
-			close: togglePanel,
+			close: closePanel,
 			copyAll,
 			toggleMode: togglePanelMode,
 			toggleResolve,
 		}),
 
 		[
-			clearHighlightedNote,
+			closePanel,
 			copyAll,
-			togglePanel,
 			togglePanelMode,
 			toggleResolve,
 		],

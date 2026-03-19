@@ -17,7 +17,7 @@ function DropdownMenu({
 	children,
 	align = "end",
 	side = "bottom",
-	sideOffset = 4,
+	sideOffset = 6,
 	className,
 }: DropdownMenuProps) {
 	return (
@@ -25,6 +25,7 @@ function DropdownMenu({
 			<MenuPrimitive.Trigger
 				data-slot="dropdown-menu-trigger"
 				render={trigger}
+				className="data-popup-open:bg-[#ECECEC] data-popup-open:hover:bg-[#ECECEC]"
 			/>
 			<MenuPrimitive.Portal>
 				<MenuPrimitive.Positioner
@@ -37,7 +38,7 @@ function DropdownMenu({
 					<MenuPrimitive.Popup
 						data-slot="dropdown-menu-content"
 						className={cn(
-							"animate-popover-in z-10005 max-h-(--available-height) min-w-32 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border border-zinc-200 bg-white p-1 text-zinc-900 shadow-md ring-1 ring-zinc-950/5 outline-none",
+							"z-10005 max-h-(--available-height) min-w-32 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-xl shadow-sm bg-white p-1 text-zinc-500 ring-1 ring-zinc-950/2 outline-none transition-[transform,opacity] data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
 							className,
 						)}
 					>
@@ -65,10 +66,10 @@ function DropdownItem({
 	return (
 		<MenuPrimitive.Item
 			data-slot="dropdown-menu-item"
-			onSelect={onSelect}
+			onClick={onSelect}
 			disabled={disabled}
 			className={cn(
-				"group/dropdown-menu-item relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-zinc-700 outline-none select-none data-highlighted:bg-zinc-100 data-highlighted:text-zinc-900 data-disabled:pointer-events-none data-disabled:opacity-50",
+				"group/dropdown-menu-item relative flex w-full cursor-default items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-zinc-700 outline-none select-none data-highlighted:bg-zinc-100 data-highlighted:text-zinc-900 data-disabled:pointer-events-none data-disabled:opacity-50",
 				className,
 			)}
 		>

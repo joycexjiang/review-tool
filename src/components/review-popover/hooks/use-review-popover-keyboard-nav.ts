@@ -11,6 +11,7 @@ export function useReviewPopoverKeyboardNav(
 	panelOpen: boolean,
 	sortedNotes: NoteView[],
 	resetKey: string,
+	onFocusChange?: (note: NoteView | null) => void,
 ) {
 	const [focusState, setFocusState] = useState({
 		focusedIndex: -1,
@@ -32,26 +33,24 @@ export function useReviewPopoverKeyboardNav(
 	useHotkey(
 		{ key: "ArrowDown", enabled: panelOpen, preventDefault: true },
 		() => {
-			setFocusState((prev) => {
-				const currentIndex =
-					prev.resetKey === resetKey ? prev.focusedIndex : -1;
-				const next = Math.min(currentIndex + 1, sortedNotes.length - 1);
-				scrollToIndex(next);
-				return { focusedIndex: next, resetKey };
-			});
+			const currentIndex =
+				focusState.resetKey === resetKey ? focusState.focusedIndex : -1;
+			const next = Math.min(currentIndex + 1, sortedNotes.length - 1);
+			scrollToIndex(next);
+			setFocusState({ focusedIndex: next, resetKey });
+			onFocusChange?.(sortedNotes[next] ?? null);
 		},
 	);
 
 	useHotkey(
 		{ key: "ArrowUp", enabled: panelOpen, preventDefault: true },
 		() => {
-			setFocusState((prev) => {
-				const currentIndex =
-					prev.resetKey === resetKey ? prev.focusedIndex : -1;
-				const next = Math.max(currentIndex - 1, 0);
-				scrollToIndex(next);
-				return { focusedIndex: next, resetKey };
-			});
+			const currentIndex =
+				focusState.resetKey === resetKey ? focusState.focusedIndex : -1;
+			const next = Math.max(currentIndex - 1, 0);
+			scrollToIndex(next);
+			setFocusState({ focusedIndex: next, resetKey });
+			onFocusChange?.(sortedNotes[next] ?? null);
 		},
 	);
 

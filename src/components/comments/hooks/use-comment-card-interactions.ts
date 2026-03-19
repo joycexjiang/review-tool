@@ -17,10 +17,18 @@ export function useCommentCardInteractions(note: NoteView) {
 
 	const handleMouseEnter = useCallback(() => {
 		setActiveNote(note.id);
-		void showHighlight(note.elementInfo.cssSelector, {
-			variant: "preview",
-		});
-	}, [note.id, note.elementInfo.cssSelector, setActiveNote, showHighlight]);
+		if (!note.resolved) {
+			void showHighlight(note.elementInfo.cssSelector, {
+				variant: "preview",
+			});
+		}
+	}, [
+		note.id,
+		note.elementInfo.cssSelector,
+		note.resolved,
+		setActiveNote,
+		showHighlight,
+	]);
 
 	const handleMouseLeave = useCallback(() => {
 		setActiveNote(null);

@@ -3,7 +3,9 @@
 import { useHotkey } from "@/hooks/use-hotkey";
 
 function isEditableTarget(target: EventTarget | null) {
-	if (!(target instanceof HTMLElement)) {return false;}
+	if (!(target instanceof HTMLElement)) {
+		return false;
+	}
 	return (
 		target instanceof HTMLInputElement ||
 		target instanceof HTMLTextAreaElement ||
@@ -15,9 +17,11 @@ function isEditableTarget(target: EventTarget | null) {
 export function useInspectorHotkeys({
 	toggleInspectMode,
 	togglePanel,
+	toggleNumberBadges,
 }: {
 	toggleInspectMode: () => void;
 	togglePanel: () => void;
+	toggleNumberBadges: () => void;
 }) {
 	useHotkey(
 		{
@@ -49,6 +53,22 @@ export function useInspectorHotkeys({
 
 			event.preventDefault();
 			togglePanel();
+		},
+	);
+
+	useHotkey(
+		{
+			key: "s",
+			metaOrCtrl: true,
+			preventDefault: false,
+		},
+		(event) => {
+			if (isEditableTarget(event.target)) {
+				return;
+			}
+
+			event.preventDefault();
+			toggleNumberBadges();
 		},
 	);
 }

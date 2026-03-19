@@ -1,12 +1,12 @@
 "use client";
 
 import { useRef } from "react";
+import NumberBadges from "@/components/comments/number-badges";
 import DemoPage from "@/components/demo/demo-page";
 import { HoverProvider } from "@/components/inspector/element-hover/hover-context";
 import HoverOverlay from "@/components/inspector/element-hover/hover-overlay";
 import ElementPopover from "@/components/inspector/element-popover";
 import { useInspector } from "@/components/inspector/hooks/use-inspector";
-import NumberBadges from "@/components/inspector/number-badges";
 import {
 	InspectorProvider,
 	useInspectorState,

@@ -1,7 +1,12 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import { useMemo } from "react";
 import TriageCommentCard from "@/components/comments/comment-card";
+import { COMMENT_SEVERITY_LABELS } from "@/components/comments/lib/comment-format";
+import { cn } from "@/lib/utils";
+import type { Severity } from "@/types";
+import SeverityIcon from "@/ui/icons/severity";
 import {
 	useReviewPopoverActions,
 	useReviewPopoverData,
@@ -11,6 +16,19 @@ import {
 	EmptyReviewState,
 	FilteredEmptyReviewState,
 } from "./review-popover-empty-states";
+
+function useBadgeNumbers(deployNotes: { id: string; resolved: boolean }[]) {
+	return useMemo(() => {
+		const map = new Map<string, number>();
+		let seq = 1;
+		for (const note of deployNotes) {
+			if (!note.resolved) {
+				map.set(note.id, seq++);
+			}
+		}
+		return map;
+	}, [deployNotes]);
+}
 
 export default function ReviewPopoverList() {
 	const { toggleResolve } = useReviewPopoverActions();
@@ -23,10 +41,11 @@ export default function ReviewPopoverList() {
 		stats,
 	} = useReviewPopoverData();
 
+	const badgeNumbers = useBadgeNumbers(deployNotes);
 	let itemIndex = 0;
 
 	return (
-		<div ref={listRef} className="relative flex-1 overflow-y-auto px-2 pb-2">
+		<div ref={listRef} className="relative flex-1 overflow-y-auto pb-2">
 			{deployNotes.length === 0 ? (
 				<EmptyReviewState />
 			) : isFilteredEmpty ? (
@@ -51,21 +70,39 @@ export default function ReviewPopoverList() {
 								>
 									<TriageCommentCard
 										note={note}
+										badgeNumber={badgeNumbers.get(note.id) ?? null}
 										onToggleResolve={toggleResolve}
 										data-focused={isFocused || undefined}
-										className={
-											isFocused ? "ring-2 ring-zinc-900/10 bg-zinc-50" : ""
-										}
+										className={cn(
+											"mx-2",
+											isFocused ? "ring-2 ring-zinc-300 bg-zinc-50" : "",
+										)}
 									/>
 								</div>
 							);
 						});
 
+						const isSeverity = section.key !== "resolved";
+						const severity = isSeverity ? (section.key as Severity) : null;
+
 						return (
 							<section key={section.key}>
-								<div className="px-3 pt-3 pb-1">
-									<span className="text-[11px] font-medium text-zinc-400">
-										{section.label}
+								<div className="flex items-center gap-2.5 px-4.5 pt-3 pb-1 mb-2 border-b border-gray-200">
+									{severity ? (
+										<SeverityIcon
+											severity={severity}
+											className="size-4 text-zinc-400"
+										/>
+									) : null}
+									<span className="flex items-baseline gap-1.5">
+										<span className="text-sm font-medium">
+											{severity
+												? COMMENT_SEVERITY_LABELS[severity]
+												: section.label}
+										</span>
+										<span className="text-xs tabular-nums text-zinc-400">
+											{section.notes.length}
+										</span>
 									</span>
 								</div>
 								{sectionItems}

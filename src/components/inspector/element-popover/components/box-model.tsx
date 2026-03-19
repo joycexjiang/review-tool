@@ -118,7 +118,7 @@ export default function BoxModel({
 
 					{/* Element core */}
 					<div className="col-start-2 row-start-2 flex min-w-0 flex-col items-center justify-center rounded border border-blue-300 bg-blue-50 px-3 py-1 text-center">
-						<span className="text-blue-700">
+						<span className="tabular-nums text-blue-700">
 							{Math.round(width)} × {Math.round(height)}
 						</span>
 					</div>

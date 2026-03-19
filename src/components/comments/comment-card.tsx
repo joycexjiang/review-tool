@@ -3,19 +3,24 @@
 import { type ComponentPropsWithoutRef, useState } from "react";
 import type { NoteView } from "@/components/inspector/lib/note-view-types";
 import { cn } from "@/lib/utils";
-import CommentCardActions from "./components/comment-card-actions";
+import CommentCardFooter from "./components/comment-card-footer";
 import CommentCardHeader from "./components/comment-card-header";
 import ResolvedCommentRow from "./components/resolved-comment-row";
 import { useCommentCardInteractions } from "./hooks/use-comment-card-interactions";
-import { COMMENT_TYPE_LABELS } from "./lib/comment-format";
+import {
+	COMMENT_TYPE_LABELS,
+	getCommentSourceLabel,
+} from "./lib/comment-format";
 
 interface TriageCommentCardProps extends ComponentPropsWithoutRef<"article"> {
 	note: NoteView;
+	badgeNumber: number | null;
 	onToggleResolve: (id: string) => void;
 }
 
 export default function TriageCommentCard({
 	note,
+	badgeNumber,
 	onToggleResolve,
 	className,
 	...props
@@ -37,13 +42,15 @@ export default function TriageCommentCard({
 		);
 	}
 
+	const sourceLabel = getCommentSourceLabel(note.elementInfo);
+
 	return (
 		<article
 			data-note-id={note.id}
 			aria-label={`${COMMENT_TYPE_LABELS[note.type]} by ${note.reviewer.name}`}
 			className={cn(
-				"group rounded-[10px] px-3 py-2.5 transition-colors duration-150",
-				note.resolved ? "opacity-50" : "hover:bg-zinc-50",
+				"group rounded-xl select-none px-3 py-2.5 transition-colors duration-150",
+				note.resolved ? "opacity-70" : "hover:bg-zinc-50",
 				className,
 			)}
 			onMouseEnter={handleMouseEnter}
@@ -51,19 +58,23 @@ export default function TriageCommentCard({
 			{...props}
 		>
 			<CommentCardHeader note={note} />
+
 			<p
 				className={cn(
-					"pl-[14px] text-[13px] leading-[1.55] text-zinc-500",
+					"text-[13px] leading-[1.55] text-zinc-700",
 					note.resolved && "line-through text-zinc-400",
 				)}
 				style={{ textWrap: "pretty" }}
 			>
 				{note.text}
 			</p>
-			<CommentCardActions
+
+			<CommentCardFooter
+				badgeNumber={badgeNumber}
 				copied={copied}
 				noteId={note.id}
 				resolved={note.resolved}
+				sourceLabel={sourceLabel !== "—" ? sourceLabel : null}
 				onCopy={handleCopy}
 				onToggleResolve={onToggleResolve}
 			/>

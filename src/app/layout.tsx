@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Review Triage — design feedback in preview deployments",
+	title: "Review Triage",
 	description:
 		"Organize, prioritize, and resolve design review feedback on preview deployments",
 };

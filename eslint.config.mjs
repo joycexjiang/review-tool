@@ -41,7 +41,7 @@ const eslintConfig = defineConfig([
 			"src/hooks/use-timeout.ts",
 			"src/hooks/use-unmount.ts",
 			"src/components/inspector/element-popover/use-element-popover.ts",
-			"src/components/inspector/number-badges/use-number-badges.ts",
+			"src/components/comments/number-badges/use-number-badges.ts",
 		],
 		rules: {
 			"no-restricted-imports": "off",

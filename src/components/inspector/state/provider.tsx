@@ -44,7 +44,9 @@ interface InspectorActions {
 	setToolbarSide: (side: ToolbarSide) => void;
 	setToolbarWidth: (width: number) => void;
 	setToolbarHeight: (height: number) => void;
+	setToolbarX: (x: number | null) => void;
 	setToolbarY: (y: number | null) => void;
+	toggleNumberBadges: () => void;
 }
 
 const InspectorActionsContext = createContext<InspectorActions | null>(null);
@@ -130,11 +132,19 @@ export function InspectorProvider({ children }: { children: React.ReactNode }) {
 		dispatch({ type: "SET_TOOLBAR_HEIGHT", payload: height });
 	}, []);
 
+	const setToolbarX = useCallback((x: number | null) => {
+		dispatch({ type: "SET_TOOLBAR_X", payload: x });
+	}, []);
+
 	const setToolbarY = useCallback((y: number | null) => {
 		dispatch({ type: "SET_TOOLBAR_Y", payload: y });
 	}, []);
 
-	useInspectorHotkeys({ toggleInspectMode, togglePanel });
+	const toggleNumberBadges = useCallback(() => {
+		dispatch({ type: "TOGGLE_NUMBER_BADGES" });
+	}, []);
+
+	useInspectorHotkeys({ toggleInspectMode, togglePanel, toggleNumberBadges });
 
 	const stateView = useMemo<InspectorStateView>(
 		() => ({
@@ -169,7 +179,9 @@ export function InspectorProvider({ children }: { children: React.ReactNode }) {
 			setToolbarSide,
 			setToolbarWidth,
 			setToolbarHeight,
+			setToolbarX,
 			setToolbarY,
+			toggleNumberBadges,
 		}),
 		[
 			toggleInspectMode,
@@ -190,7 +202,9 @@ export function InspectorProvider({ children }: { children: React.ReactNode }) {
 			setToolbarSide,
 			setToolbarWidth,
 			setToolbarHeight,
+			setToolbarX,
 			setToolbarY,
+			toggleNumberBadges,
 		],
 	);
 

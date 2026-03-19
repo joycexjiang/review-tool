@@ -7,8 +7,14 @@ import NumberBadgeOverlay from "./number-badge-overlay";
 import { useNumberBadges } from "./use-number-badges";
 
 export default function NumberBadges() {
-	const { notes, activeNoteId, reviewPopover, drawerWidth, activeDeploy } =
-		useInspectorState();
+	const {
+		notes,
+		activeNoteId,
+		reviewPopover,
+		drawerWidth,
+		activeDeploy,
+		numberBadgesVisible,
+	} = useInspectorState();
 	const panelOpen = isPanelOpen(reviewPopover);
 	const panelMode = getPanelMode(reviewPopover);
 	const deployNotes = useDeployNotes(notes, activeDeploy);
@@ -34,6 +40,7 @@ export default function NumberBadges() {
 						isActive={activeNoteId === entry.id}
 						isMuted={hasActiveNote && activeNoteId !== entry.id}
 						position={position}
+						visible={numberBadgesVisible}
 					/>
 				);
 			})}

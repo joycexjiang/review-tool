@@ -8,7 +8,6 @@ import type {
 } from "@/components/inspector/lib/note-view-types";
 import {
 	isFixedInDeployNote,
-	isNewNote,
 	isResolvedNote,
 } from "@/components/inspector/lib/note-view-types";
 import type { FilterState } from "@/components/inspector/state/types";
@@ -99,7 +98,6 @@ export function useReviewStats(notes: NoteView[]): ReviewStats {
 			major: 0,
 			minor: 0,
 			fixedInDeploy: 0,
-			newInDeploy: 0,
 		};
 
 		for (const note of notes) {
@@ -122,9 +120,6 @@ export function useReviewStats(notes: NoteView[]): ReviewStats {
 
 			if (isFixedInDeployNote(note)) {
 				stats.fixedInDeploy++;
-			}
-			if (isNewNote(note)) {
-				stats.newInDeploy++;
 			}
 		}
 

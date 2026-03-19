@@ -36,22 +36,22 @@ export default function PricingHero({
 				<button
 					type="button"
 					onClick={() => onBillingChange("monthly")}
-					className={`rounded-full px-5 py-1.5 text-[13px] font-medium transition-all duration-200 ${
-						billing === "monthly"
-							? "bg-zinc-950 text-white shadow-sm"
-							: "text-zinc-500 hover:text-zinc-800"
-					}`}
+				className={`rounded-full px-5 py-1.5 text-[13px] font-medium transition-[background-color,color,box-shadow] duration-200 ${
+					billing === "monthly"
+						? "bg-zinc-950 text-white shadow-sm"
+						: "text-zinc-500 hover:text-zinc-800"
+				}`}
 				>
 					Monthly
 				</button>
 				<button
 					type="button"
 					onClick={() => onBillingChange("annual")}
-					className={`rounded-full px-5 py-1.5 text-[13px] font-medium transition-all duration-200 ${
-						billing === "annual"
-							? "bg-zinc-950 text-white shadow-sm"
-							: "text-zinc-500 hover:text-zinc-800"
-					}`}
+				className={`rounded-full px-5 py-1.5 text-[13px] font-medium transition-[background-color,color,box-shadow] duration-200 ${
+					billing === "annual"
+						? "bg-zinc-950 text-white shadow-sm"
+						: "text-zinc-500 hover:text-zinc-800"
+				}`}
 				>
 					Annual
 					<span className="ml-1.5 text-[11px] font-semibold text-emerald-600">

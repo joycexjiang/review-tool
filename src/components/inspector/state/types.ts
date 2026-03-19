@@ -10,7 +10,7 @@ export interface FilterState {
 	type: CommentType | null;
 }
 
-export type ToolbarSide = "left" | "right";
+export type ToolbarSide = "left" | "right" | "top" | "bottom";
 export type PanelMode = "floating" | "drawer";
 
 export type InspectionState =
@@ -38,7 +38,9 @@ export interface InspectorState {
 	toolbarSide: ToolbarSide;
 	toolbarWidth: number;
 	toolbarHeight: number;
+	toolbarX: number | null;
 	toolbarY: number | null;
+	numberBadgesVisible: boolean;
 }
 
 export type InspectorAction =
@@ -60,7 +62,9 @@ export type InspectorAction =
 	| { type: "SET_TOOLBAR_SIDE"; payload: ToolbarSide }
 	| { type: "SET_TOOLBAR_WIDTH"; payload: number }
 	| { type: "SET_TOOLBAR_HEIGHT"; payload: number }
-	| { type: "SET_TOOLBAR_Y"; payload: number | null };
+	| { type: "SET_TOOLBAR_X"; payload: number | null }
+	| { type: "SET_TOOLBAR_Y"; payload: number | null }
+	| { type: "TOGGLE_NUMBER_BADGES" };
 
 export const initialFilters: FilterState = {
 	type: null,
@@ -69,18 +73,20 @@ export const initialFilters: FilterState = {
 export const initialInspectorState: InspectorState = {
 	inspection: { type: "idle" },
 	notes: [],
-	reviewPopover: { type: "open-floating" },
+	reviewPopover: { type: "closed-floating" },
 	drawerWidth: REVIEW_POPOVER_DRAWER_DEFAULT_WIDTH,
 	announcement: "",
 	highlightedNoteId: null,
 	activeNoteId: null,
 	deploys: [],
-	activeDeploy: "v1",
+	activeDeploy: "v2",
 	filters: initialFilters,
 	toolbarSide: "right",
 	toolbarWidth: REVIEW_POPOVER_TOOLBAR_DEFAULT_WIDTH,
 	toolbarHeight: REVIEW_POPOVER_TOOLBAR_DEFAULT_HEIGHT,
+	toolbarX: null,
 	toolbarY: null,
+	numberBadgesVisible: true,
 };
 
 export interface InspectorStateView extends InspectorState {

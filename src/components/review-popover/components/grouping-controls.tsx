@@ -6,6 +6,7 @@ import {
 	useInspectorState,
 } from "@/components/inspector/state/provider";
 import type { CommentType } from "@/types";
+import { Tabs, TabsIndicator, TabsList, TabsTrigger } from "@/ui/tabs";
 
 interface TypeFilterProps {
 	deployNotes: NoteView[];
@@ -13,14 +14,16 @@ interface TypeFilterProps {
 
 const TYPE_OPTIONS: { key: CommentType | "all"; label: string }[] = [
 	{ key: "all", label: "All" },
-	{ key: "bug", label: "Bugs" },
-	{ key: "suggestion", label: "Suggestions" },
-	{ key: "question", label: "Questions" },
+	{ key: "bug", label: "Bug" },
+	{ key: "suggestion", label: "Suggestion" },
+	{ key: "question", label: "Question" },
 ];
 
 export default function TypeFilter({ deployNotes }: TypeFilterProps) {
 	const { filters } = useInspectorState();
 	const { setTypeFilter } = useInspectorActions();
+
+	const activeValue = filters.type ?? "all";
 
 	const counts = {
 		all: deployNotes.length,
@@ -30,32 +33,35 @@ export default function TypeFilter({ deployNotes }: TypeFilterProps) {
 	};
 
 	return (
-		<div className="flex gap-0.5" role="tablist" aria-label="Filter by type">
-			{TYPE_OPTIONS.map(({ key, label }) => {
-				const count = counts[key];
-				const isActive =
-					key === "all" ? filters.type === null : filters.type === key;
+		<Tabs
+			value={activeValue}
+			onValueChange={(value) =>
+				setTypeFilter(value === "all" ? null : (value as CommentType))
+			}
+		>
+			<TabsList
+				className="gap-1 rounded-full bg-transparent p-0"
+				aria-label="Filter by type"
+			>
+				{TYPE_OPTIONS.map(({ key, label }) => {
+					const count = counts[key];
 
-				if (count === 0 && key !== "all") {return null;}
+					if (count === 0 && key !== "all") {
+						return null;
+					}
 
-				return (
-					<button
-						key={key}
-						type="button"
-						role="tab"
-						aria-selected={isActive}
-						onClick={() => setTypeFilter(key === "all" ? null : key)}
-						className={`rounded-lg px-2.5 py-1.5 text-[12px] font-medium tabular-nums transition-colors duration-150 ${
-							isActive
-								? "bg-zinc-900 text-white"
-								: "text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600"
-						}`}
-					>
-						{label}
-						{isActive && <span className="ml-1 text-zinc-500">{count}</span>}
-					</button>
-				);
-			})}
-		</div>
+					return (
+						<TabsTrigger
+							key={key}
+							value={key}
+							className="h-auto rounded-full px-2.5 py-1.5 text-[12px] font-medium tabular-nums"
+						>
+							{label}
+						</TabsTrigger>
+					);
+				})}
+				<TabsIndicator className="rounded-full" />
+			</TabsList>
+		</Tabs>
 	);
 }

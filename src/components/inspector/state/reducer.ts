@@ -3,18 +3,14 @@
 import { createMockNotes } from "@/mock/comments";
 import { deploys } from "@/mock/deploys";
 import type { InspectorAction, InspectorState } from "./types";
-import {
-	initialFilters,
-	initialInspectorState,
-	isPanelOpen,
-} from "./types";
+import { initialFilters, initialInspectorState, isPanelOpen } from "./types";
 
 export function createInitialInspectorState(): InspectorState {
 	return {
 		...initialInspectorState,
 		notes: createMockNotes(),
 		deploys,
-		activeDeploy: "v1",
+		activeDeploy: "v2",
 	};
 }
 
@@ -91,9 +87,11 @@ export function inspectorReducer(
 						reviewPopover: { type: "open-drawer", isResizing: false },
 					};
 				case "open-drawer":
+					// Close to floating mode so the drawer unmounts and the demo
+					// content area expands back to full width (same as collapse).
 					return {
 						...state,
-						reviewPopover: { type: "closed-drawer" },
+						reviewPopover: { type: "closed-floating" },
 					};
 			}
 			return state;
@@ -109,7 +107,6 @@ export function inspectorReducer(
 					return {
 						...state,
 						reviewPopover: { type: "open-drawer", isResizing: false },
-						toolbarSide: "left",
 					};
 				case "closed-drawer":
 					return {
@@ -188,8 +185,14 @@ export function inspectorReducer(
 		case "SET_TOOLBAR_HEIGHT":
 			return { ...state, toolbarHeight: action.payload };
 
+		case "SET_TOOLBAR_X":
+			return { ...state, toolbarX: action.payload };
+
 		case "SET_TOOLBAR_Y":
 			return { ...state, toolbarY: action.payload };
+
+		case "TOGGLE_NUMBER_BADGES":
+			return { ...state, numberBadgesVisible: !state.numberBadgesVisible };
 
 		default:
 			return state;
