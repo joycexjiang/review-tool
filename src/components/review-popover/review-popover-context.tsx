@@ -5,6 +5,7 @@ import type {
 	NoteView,
 	ReviewStats,
 } from "@/components/inspector/lib/note-view-types";
+import type { ToolbarSide } from "@/components/inspector/state/types";
 import type { SeveritySection } from "./lib/review-popover-sections";
 
 export interface ReviewPopoverDataValue {
@@ -17,7 +18,6 @@ export interface ReviewPopoverDataValue {
 	listRef: React.RefObject<HTMLDivElement | null>;
 	sections: SeveritySection[];
 	stats: ReviewStats;
-	unresolvedCount: number;
 }
 
 export interface ReviewPopoverActionsValue {
@@ -41,7 +41,7 @@ export interface ReviewPopoverLayoutValue {
 	floatingWidth: number;
 	isDragging: boolean;
 	isDrawerMode: boolean;
-	isLeft: boolean;
+	panelSide: ToolbarSide;
 	panelOpen: boolean;
 	onDrawerResize: (
 		event: MouseEvent | TouchEvent,

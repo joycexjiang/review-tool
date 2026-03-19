@@ -127,10 +127,6 @@ export function getPanelMode(reviewPopover: ReviewPopoverState): PanelMode {
 	return reviewPopover.type.endsWith("drawer") ? "drawer" : "floating";
 }
 
-export function isDrawerPanelMode(reviewPopover: ReviewPopoverState): boolean {
-	return getPanelMode(reviewPopover) === "drawer";
-}
-
 export function isDrawerPanelOpen(reviewPopover: ReviewPopoverState): boolean {
 	return reviewPopover.type === "open-drawer";
 }

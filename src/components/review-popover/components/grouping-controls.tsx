@@ -1,5 +1,9 @@
 "use client";
 
+import {
+	COMMENT_TYPE_DOT,
+	COMMENT_TYPE_LABELS,
+} from "@/components/comments/lib/comment-format";
 import type { NoteView } from "@/components/inspector/lib/note-view-types";
 import {
 	useInspectorActions,
@@ -12,11 +16,11 @@ interface TypeFilterProps {
 	deployNotes: NoteView[];
 }
 
-const TYPE_OPTIONS: { key: CommentType | "all"; label: string }[] = [
-	{ key: "all", label: "All" },
-	{ key: "bug", label: "Bug" },
-	{ key: "suggestion", label: "Suggestion" },
-	{ key: "question", label: "Question" },
+const FILTER_KEYS: (CommentType | "all")[] = [
+	"all",
+	"bug",
+	"suggestion",
+	"question",
 ];
 
 export default function TypeFilter({ deployNotes }: TypeFilterProps) {
@@ -43,21 +47,32 @@ export default function TypeFilter({ deployNotes }: TypeFilterProps) {
 				className="gap-1 rounded-full bg-transparent p-0"
 				aria-label="Filter by type"
 			>
-				{TYPE_OPTIONS.map(({ key, label }) => {
+				{FILTER_KEYS.map((key) => {
 					const count = counts[key];
 
 					if (count === 0 && key !== "all") {
 						return null;
 					}
 
+					const dot = key !== "all" ? COMMENT_TYPE_DOT[key] : null;
+					const label = key === "all" ? "All" : COMMENT_TYPE_LABELS[key];
+
 					return (
-						<TabsTrigger
-							key={key}
-							value={key}
-							className="h-auto rounded-full px-2.5 py-1.5 text-[12px] font-medium tabular-nums"
-						>
+					<TabsTrigger
+						key={key}
+						value={key}
+						className="h-auto rounded-full px-2.5 py-1.5 text-[12px] font-medium tabular-nums"
+					>
+						<span className="flex items-center gap-1.5">
+							{dot ? (
+								<span
+									className={`size-1.5 shrink-0 rounded-full ${dot}`}
+									aria-hidden
+								/>
+							) : null}
 							{label}
-						</TabsTrigger>
+						</span>
+					</TabsTrigger>
 					);
 				})}
 				<TabsIndicator className="rounded-full" />

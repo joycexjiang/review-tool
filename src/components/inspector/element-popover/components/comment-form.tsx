@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import {
-	SEVERITY_LABELS,
-	SEVERITY_ORDER,
-} from "@/components/comments/severity-scale";
+	COMMENT_SEVERITY_LABELS,
+	COMMENT_TYPE_DOT,
+	COMMENT_TYPE_LABELS,
+	COMMENT_TYPES,
+} from "@/components/comments/lib/comment-format";
+import { SEVERITY_ORDER } from "@/components/comments/severity-scale";
 import type { CommentType, Severity } from "@/types";
 import { Button } from "@/ui/button";
 import { DropdownItem, DropdownMenu } from "@/ui/dropdown-menu";
@@ -12,16 +15,6 @@ import ArrowRightIcon from "@/ui/icons/arrow-right";
 import ChevronDownIcon from "@/ui/icons/chevron-down";
 import SeverityIcon from "@/ui/icons/severity";
 import { Input } from "@/ui/input";
-
-const CATEGORY_OPTIONS: {
-	value: CommentType;
-	label: string;
-	dot: string;
-}[] = [
-	{ value: "bug", label: "Bug", dot: "bg-red-500" },
-	{ value: "suggestion", label: "Suggestion", dot: "bg-blue-500" },
-	{ value: "question", label: "Question", dot: "bg-amber-400" },
-];
 
 const DROPDOWN_TRIGGER_CLASS =
 	"inline-flex w-full bg-white min-w-0 items-center justify-between gap-1.5 rounded-lg border border-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-700 transition-[background-color,border-color] hover:border-zinc-300 hover:bg-zinc-100 data-[popup-open]:border-zinc-300 data-[popup-open]:bg-zinc-100";
@@ -44,9 +37,6 @@ export default function CommentForm({ onSubmit }: CommentFormProps) {
 		setText("");
 	};
 
-	const categoryLabel =
-		CATEGORY_OPTIONS.find((o) => o.value === type)?.label ?? "Bug";
-
 	return (
 		<form onSubmit={handleSubmit} className="space-y-2">
 			<div className="flex gap-2">
@@ -57,14 +47,14 @@ export default function CommentForm({ onSubmit }: CommentFormProps) {
 						<button
 							type="button"
 							className={DROPDOWN_TRIGGER_CLASS}
-							aria-label="Merge priority"
+							aria-label="Comment severity"
 						>
 							<span className="flex min-w-0 items-center gap-1.5">
 								<SeverityIcon
 									severity={severity}
 									className="size-3.5 shrink-0"
 								/>
-								{SEVERITY_LABELS[severity]}
+								{COMMENT_SEVERITY_LABELS[severity]}
 							</span>
 							<ChevronDownIcon className="size-3 shrink-0 text-zinc-400" />
 						</button>
@@ -77,7 +67,7 @@ export default function CommentForm({ onSubmit }: CommentFormProps) {
 									<SeverityIcon severity={s} />
 								</span>
 								<span className="block max-w-full truncate select-none">
-									{SEVERITY_LABELS[s]}
+									{COMMENT_SEVERITY_LABELS[s]}
 								</span>
 							</span>
 						</DropdownItem>
@@ -90,22 +80,28 @@ export default function CommentForm({ onSubmit }: CommentFormProps) {
 						<button
 							type="button"
 							className={DROPDOWN_TRIGGER_CLASS}
-							aria-label="Category"
+							aria-label="Comment category"
 						>
-							{categoryLabel}
+							<span className="flex min-w-0 items-center gap-1.5">
+								<span
+									className={`size-1.5 shrink-0 rounded-full ${COMMENT_TYPE_DOT[type]}`}
+									aria-hidden
+								/>
+								{COMMENT_TYPE_LABELS[type]}
+							</span>
 							<ChevronDownIcon className="size-3 shrink-0 text-zinc-400" />
 						</button>
 					}
 				>
-					{CATEGORY_OPTIONS.map((ct) => (
-						<DropdownItem key={ct.value} onSelect={() => setType(ct.value)}>
-							<span className="flex min-w-0 items-center gap-1">
+					{COMMENT_TYPES.map((ct) => (
+						<DropdownItem key={ct} onSelect={() => setType(ct)}>
+							<span className="flex min-w-0 items-center gap-1.5">
 								<span
-									className={`size-1 shrink-0 rounded-full ${ct.dot}`}
+									className={`size-1.5 shrink-0 rounded-full ${COMMENT_TYPE_DOT[ct]}`}
 									aria-hidden
 								/>
 								<span className="block max-w-full truncate select-none">
-									{ct.label}
+									{COMMENT_TYPE_LABELS[ct]}
 								</span>
 							</span>
 						</DropdownItem>

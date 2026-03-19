@@ -64,7 +64,6 @@ export default function TriageCommentCard({
 					"text-[13px] leading-[1.55] text-zinc-700",
 					note.resolved && "line-through text-zinc-400",
 				)}
-				style={{ textWrap: "pretty" }}
 			>
 				{note.text}
 			</p>
@@ -82,5 +81,4 @@ export default function TriageCommentCard({
 	);
 }
 
-export { TriageCommentCard as PanelCommentCard };
 export { formatCommentMarkdown } from "./lib/comment-format";

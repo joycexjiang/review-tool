@@ -20,7 +20,7 @@ export default function ToolbarShell({
 	} = useToolbarLayoutContext();
 
 	const isVertical =
-		!isDrawerOpen && (toolbarSide === "left" || toolbarSide === "right");
+		isDrawerOpen || toolbarSide === "left" || toolbarSide === "right";
 
 	return (
 		<div

@@ -1,17 +1,19 @@
 "use client";
 
-import type { Note, Severity } from "@/types";
+import type { CommentType, Note, Severity } from "@/types";
 
-export const COMMENT_TYPE_LABELS: Record<string, string> = {
+export const COMMENT_TYPES: CommentType[] = ["bug", "suggestion", "question"];
+
+export const COMMENT_TYPE_LABELS: Record<CommentType, string> = {
 	bug: "Bug",
 	suggestion: "Suggestion",
 	question: "Question",
 };
 
-export const COMMENT_SEVERITY_DOT: Record<Severity, string> = {
-	blocking: "bg-red-500",
-	major: "bg-amber-400",
-	minor: "bg-zinc-300",
+export const COMMENT_TYPE_DOT: Record<CommentType, string> = {
+	bug: "bg-red-500",
+	suggestion: "bg-blue-500",
+	question: "bg-amber-400",
 };
 
 export const COMMENT_SEVERITY_COLOR: Record<Severity, string> = {

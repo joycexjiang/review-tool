@@ -1,8 +1,7 @@
 "use client";
 
+import type { ToolbarSide } from "@/components/inspector/state/types";
 import { cn } from "@/lib/utils";
-import ArrowRightIcon from "@/ui/icons/arrow-right";
-import EnterIcon from "@/ui/icons/enter";
 import {
 	useReviewPopoverData,
 	useReviewPopoverLayoutContext,
@@ -15,10 +14,17 @@ import ReviewPopoverHeader from "./header";
 import HighlightedNoteScroller from "./highlighted-note-scroller";
 import ProgressBar from "./progress-ring";
 
+const ORIGIN_CLASS: Record<ToolbarSide, string> = {
+	left: "origin-left",
+	right: "origin-right",
+	top: "origin-top",
+	bottom: "origin-bottom",
+};
+
 export default function ReviewPopoverPanel() {
 	const { deployNotes, fixPrompt, highlightedNoteId, listRef, stats } =
 		useReviewPopoverData();
-	const { edgeMargin, floatingHeight, isDrawerMode, isLeft, panelOpen } =
+	const { edgeMargin, floatingHeight, isDrawerMode, panelSide, panelOpen } =
 		useReviewPopoverLayoutContext();
 
 	return (
@@ -29,7 +35,7 @@ export default function ReviewPopoverPanel() {
 				isDrawerMode
 					? "h-screen border-l border-zinc-200 origin-top-right transition-opacity"
 					: "rounded-2xl border border-gray-200 shadow-[inset_0_0_0_1px_white,0_1px_2px_rgb(17_24_39/0.05),0_4px_12px_rgb(17_24_39/0.04),0_16px_40px_rgb(17_24_39/0.06)] outline-none transition-[scale,opacity]",
-				!isDrawerMode && (isLeft ? "origin-left" : "origin-right"),
+				!isDrawerMode && ORIGIN_CLASS[panelSide],
 				panelOpen || isDrawerMode ? "scale-100" : "scale-[0.96]",
 				panelOpen
 					? "opacity-100 duration-220 ease-[cubic-bezier(0.23,1,0.32,1)]"
@@ -70,31 +76,19 @@ export default function ReviewPopoverPanel() {
 				<div className="space-y-1 px-2 py-2">
 					<ProgressBar resolved={stats.resolved} total={stats.total} />
 					<div className="flex items-center justify-between pl-2">
-						<span className="flex items-center gap-1 text-[10px] text-zinc-400">
-							Navigate
-							<span className="flex items-center -gap-1">
-								<ArrowRightIcon className="size-3 rotate-90" />
-								<ArrowRightIcon className="size-3 rotate-270" />
-							</span>
-							Enter
-							<EnterIcon className="size-2.5" />
+						<span
+							className={cn(
+								"truncate text-xs tabular-nums",
+								stats.total > 0 && stats.unresolved === 0
+									? "text-emerald-600"
+									: "text-zinc-400",
+							)}
+						>
+							{stats.total > 0 && stats.unresolved === 0
+								? "All resolved"
+								: `${stats.unresolved} unresolved`}
 						</span>
-
-						<div className="flex items-center gap-2">
-							<span
-								className={cn(
-									"truncate text-xs",
-									stats.total > 0 && stats.unresolved === 0
-										? "text-emerald-600"
-										: "text-zinc-400",
-								)}
-							>
-								{stats.total > 0 && stats.unresolved === 0
-									? "All resolved"
-									: `${stats.unresolved} unresolved`}
-							</span>
-							<FixWithMenu prompt={fixPrompt} />
-						</div>
+						<FixWithMenu prompt={fixPrompt} />
 					</div>
 				</div>
 			</div>

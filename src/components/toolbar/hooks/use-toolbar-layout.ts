@@ -10,6 +10,7 @@ const TOOLBAR_DEFAULT_BOTTOM = 20;
 const TOOLBAR_DEFAULT_HEIGHT = 42;
 
 interface UseToolbarLayoutOptions {
+	drawerWidth: number;
 	panelMode: "floating" | "drawer";
 	panelOpen: boolean;
 	toolbarHeight: number;
@@ -24,6 +25,7 @@ interface UseToolbarLayoutOptions {
 }
 
 export function useToolbarLayout({
+	drawerWidth,
 	panelMode,
 	panelOpen,
 	toolbarHeight,
@@ -78,13 +80,13 @@ export function useToolbarLayout({
 			onPointerUp: isDrawerOpen ? undefined : handlePointerUp,
 			style: isDrawerOpen
 				? {
-						left: "50%",
-						right: "auto",
-						top: "auto",
-						bottom: TOOLBAR_DEFAULT_BOTTOM,
-						transform: "translateX(-50%)",
+						left: "auto",
+						right: drawerWidth + 12,
+						top: 12,
+						bottom: "auto",
+						transform: "none",
 						transition:
-							"left 300ms cubic-bezier(0.22,1,0.36,1), transform 300ms cubic-bezier(0.22,1,0.36,1)",
+							"right 300ms cubic-bezier(0.22,1,0.36,1)",
 					}
 				: toolbarY === null && !isHorizontalEdge
 					? {
@@ -96,6 +98,7 @@ export function useToolbarLayout({
 			toolbarSide,
 		};
 	}, [
+		drawerWidth,
 		elementRef,
 		handlePointerCancel,
 		handlePointerDown,

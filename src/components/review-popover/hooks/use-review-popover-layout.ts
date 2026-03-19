@@ -11,10 +11,13 @@ const DRAWER_MAX_WIDTH = 720;
 const FLOATING_WIDTH = 440;
 const FLOATING_HEIGHT = 740;
 const TOOLBAR_DEFAULT_HEIGHT = 42;
-const TOOLBAR_GAP = 8;
+const TOOLBAR_GAP = 4;
 const FOLLOW_TRANSITION =
-	"left 300ms cubic-bezier(0.22, 1, 0.36, 1), right 300ms cubic-bezier(0.22, 1, 0.36, 1)";
-const DEFAULT_FLOATING_TOP = `max(${EDGE_MARGIN}px, calc(50vh - ${FLOATING_HEIGHT / 2}px))`;
+	"left 300ms cubic-bezier(0.22, 1, 0.36, 1), right 300ms cubic-bezier(0.22, 1, 0.36, 1), top 300ms cubic-bezier(0.22, 1, 0.36, 1)";
+
+function getDefaultFloatingTopCss(floatingHeight: number): string {
+	return `max(${EDGE_MARGIN}px, calc(50vh - ${floatingHeight / 2}px))`;
+}
 
 function clampFloatingTop(
 	top: number | undefined,
@@ -36,12 +39,16 @@ function clampFloatingTop(
 	return Math.max(EDGE_MARGIN, Math.min(maxTop, top));
 }
 
-function getFloatingHeight(viewportHeight: number | null) {
+function getFloatingHeight(
+	viewportHeight: number | null,
+	reservedTop?: number,
+) {
 	if (viewportHeight === null) {
 		return FLOATING_HEIGHT;
 	}
 
-	return Math.min(FLOATING_HEIGHT, viewportHeight - EDGE_MARGIN * 2);
+	const topSpace = reservedTop ?? EDGE_MARGIN;
+	return Math.min(FLOATING_HEIGHT, viewportHeight - topSpace - EDGE_MARGIN);
 }
 
 function getDefaultFloatingTop(
@@ -63,19 +70,11 @@ interface UseReviewPopoverLayoutOptions {
 	toolbarSide: ToolbarSide;
 	toolbarWidth: number;
 	toolbarHeight: number;
+	toolbarX: number | null;
 	toolbarY: number | null;
 	setToolbarSide: (side: ToolbarSide) => void;
+	setToolbarX: (x: number | null) => void;
 	setToolbarY: (y: number | null) => void;
-}
-
-function resolveHorizontalSide(
-	side: ToolbarSide,
-): Extract<ToolbarSide, "left" | "right"> {
-	if (side === "left" || side === "right") {
-		return side;
-	}
-
-	return "right";
 }
 
 export function useReviewPopoverLayout({
@@ -83,19 +82,25 @@ export function useReviewPopoverLayout({
 	toolbarSide,
 	toolbarWidth,
 	toolbarHeight,
+	toolbarX,
 	toolbarY,
 	setToolbarSide,
+	setToolbarX,
 	setToolbarY,
 }: UseReviewPopoverLayoutOptions) {
 	const viewportSize = useViewportSize();
 	const viewportHeight = viewportSize?.height ?? null;
 	const viewportWidth = viewportSize?.width ?? null;
 	const isDrawerMode = panelMode === "drawer";
-	const panelSide = resolveHorizontalSide(toolbarSide);
-	const isLeft = panelSide === "left";
-	const floatingHeight = getFloatingHeight(viewportHeight);
+	const isHorizontalEdge = toolbarSide === "top" || toolbarSide === "bottom";
 	const resolvedToolbarHeight = toolbarHeight || TOOLBAR_DEFAULT_HEIGHT;
-	const panelEdgeOffset = EDGE_MARGIN + toolbarWidth + TOOLBAR_GAP;
+	const panelEdgeOffset = isHorizontalEdge
+		? EDGE_MARGIN + resolvedToolbarHeight + TOOLBAR_GAP
+		: EDGE_MARGIN + toolbarWidth + TOOLBAR_GAP;
+	const floatingHeight = getFloatingHeight(
+		viewportHeight,
+		isHorizontalEdge ? panelEdgeOffset : EDGE_MARGIN,
+	);
 	const maxDrawerWidth =
 		viewportWidth === null
 			? DRAWER_MAX_WIDTH
@@ -103,6 +108,16 @@ export function useReviewPopoverLayout({
 					DRAWER_MAX_WIDTH,
 					Math.max(DRAWER_MIN_WIDTH, viewportWidth - 280),
 				);
+
+	const popoverX =
+		isHorizontalEdge && toolbarX !== null
+			? toolbarX - (FLOATING_WIDTH - toolbarWidth) / 2
+			: null;
+
+	const popoverY =
+		!isHorizontalEdge && toolbarY !== null
+			? toolbarY - (floatingHeight - resolvedToolbarHeight) / 2
+			: null;
 
 	const {
 		elementRef,
@@ -112,17 +127,22 @@ export function useReviewPopoverLayout({
 		handlePointerUp,
 		handlePointerCancel,
 	} = useDockedFloatingPosition({
-		side: panelSide,
-		y:
-			toolbarY === null
-				? null
-				: toolbarY - (floatingHeight - resolvedToolbarHeight) / 2,
+		side: toolbarSide,
+		x: popoverX,
+		y: popoverY,
 		viewportHeight,
 		viewportWidth,
 		sideOffset: panelEdgeOffset,
-		defaultTop: getDefaultFloatingTop(floatingHeight, viewportHeight),
-		allowedSides: ["left", "right"],
+		defaultTop: isHorizontalEdge
+			? undefined
+			: getDefaultFloatingTop(floatingHeight, viewportHeight),
+		allowedSides: ["left", "right", "top", "bottom"],
 		onSideChange: setToolbarSide,
+		onXChange: (nextX) => {
+			setToolbarX(
+				nextX === null ? null : nextX + (FLOATING_WIDTH - toolbarWidth) / 2,
+			);
+		},
 		onYChange: (nextTop) => {
 			setToolbarY(
 				nextTop === null
@@ -135,6 +155,14 @@ export function useReviewPopoverLayout({
 			!target.closest("button"),
 	});
 
+	const floatingTop = isHorizontalEdge
+		? positionStyle.top
+		: toolbarY === null
+			? getDefaultFloatingTopCss(floatingHeight)
+			: typeof positionStyle.top === "number"
+				? clampFloatingTop(positionStyle.top, viewportHeight)
+				: positionStyle.top;
+
 	return {
 		drawer: {
 			defaultWidth: DRAWER_DEFAULT_WIDTH,
@@ -146,12 +174,7 @@ export function useReviewPopoverLayout({
 		floating: {
 			followTransition: FOLLOW_TRANSITION,
 			height: floatingHeight,
-			top:
-				toolbarY === null
-					? DEFAULT_FLOATING_TOP
-					: typeof positionStyle.top === "number"
-						? clampFloatingTop(positionStyle.top, viewportHeight)
-						: positionStyle.top,
+			top: floatingTop,
 			width: FLOATING_WIDTH,
 		},
 		handlePointerCancel,
@@ -159,7 +182,7 @@ export function useReviewPopoverLayout({
 		handlePointerMove,
 		handlePointerUp,
 		isDrawerMode,
-		isLeft,
+		panelSide: toolbarSide,
 		positionStyle,
 		toolbarDefaultHeight: TOOLBAR_DEFAULT_HEIGHT,
 	};

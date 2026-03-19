@@ -1,23 +1,19 @@
 "use client";
 
 import { useCallback } from "react";
+import { CommentSourceCode } from "@/components/comments/comment-meta";
 import {
-	CommentSeverityBadge,
-	CommentSourceCode,
-} from "@/components/comments/comment-meta";
+	COMMENT_SEVERITY_LABELS,
+	COMMENT_TYPE_DOT,
+	COMMENT_TYPE_LABELS,
+} from "@/components/comments/lib/comment-format";
 import { useElementHighlightOverlay } from "@/components/inspector/hooks/use-element-highlight-overlay";
 import { useInspectorActions } from "@/components/inspector/state/provider";
 import { cn } from "@/lib/utils";
-import type { CommentType } from "@/types";
+import SeverityIcon from "@/ui/icons/severity";
 import { NUMBER_BADGE_CLASS } from "@/ui/number-badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import type { BadgeEntry } from "./types";
-
-const TYPE_LABELS = {
-	bug: "Bug",
-	suggestion: "Suggestion",
-	question: "Question",
-} satisfies Record<CommentType, string>;
 
 export default function NumberBadgeHoverComment({
 	entry,
@@ -65,7 +61,7 @@ export default function NumberBadgeHoverComment({
 						type="button"
 						className={cn(
 							NUMBER_BADGE_CLASS,
-							"pointer-events-auto cursor-pointer transition-[transform,background-color,color,opacity] duration-150 hover:scale-105",
+							"pointer-events-auto cursor-pointer transition-[transform,background-color,color,opacity] duration-150 hover:scale-105 active:scale-95",
 							isActive ? "scale-105" : "",
 							isMuted ? "bg-zinc-200! text-white shadow-none" : "",
 						)}
@@ -82,40 +78,46 @@ export default function NumberBadgeHoverComment({
 				sideOffset={12}
 				initialFocus={false}
 				finalFocus={false}
+				className="drop-shadow-sm"
 			>
-				<article className="w-80 max-w-[calc(100vw-1rem)] rounded-xl bg-white px-3.5 py-3 border border-inset border-zinc-200 shadow-sm">
-					<div className="mb-2 flex items-start gap-2">
-						<div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
-							<span className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ring-1 ring-inset">
-								{TYPE_LABELS[entry.note.type]}
-							</span>
-							<CommentSeverityBadge
-								severity={entry.note.severity}
-								className="text-zinc-600"
-								iconClassName="size-4"
+				<article className="w-80 rounded-xl border border-zinc-200 bg-white p-3.5">
+					<div className="mb-2.5 flex flex-wrap items-center gap-1.5">
+						<span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 px-2 py-1 text-xs font-medium text-zinc-700">
+							<span
+								className={`size-1.5 shrink-0 rounded-full ${COMMENT_TYPE_DOT[entry.note.type]}`}
+								aria-hidden
 							/>
-						</div>
+							{COMMENT_TYPE_LABELS[entry.note.type]}
+						</span>
+						<span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 px-2 py-1 text-xs font-medium text-zinc-700">
+							<SeverityIcon
+								severity={entry.note.severity}
+								className="size-3.5 shrink-0"
+							/>
+							{COMMENT_SEVERITY_LABELS[entry.note.severity]}
+						</span>
 					</div>
 
-					<div className="mb-2 flex items-center justify-between gap-3">
-						<span className="truncate text-[12px] font-medium text-zinc-900">
+					<div className="mb-1 flex items-center gap-1.5">
+						<span className="text-[12px] font-medium text-zinc-900">
 							{entry.note.reviewer.name}
 						</span>
 						<span
 							suppressHydrationWarning
-							className="shrink-0 text-[11px] text-zinc-500"
+							className="text-xs text-zinc-400"
+							title={entry.note.relativeTimeLabel}
 						>
 							{entry.note.relativeTimeLabel}
 						</span>
 					</div>
 
-					<p className="text-[13px] leading-relaxed text-zinc-700">
+					<p className="text-[13px] leading-[1.55] text-zinc-700">
 						{entry.note.text}
 					</p>
 
 					<CommentSourceCode
 						source={entry.note.elementInfo}
-						className="w-full px-2 py-1 text-zinc-600"
+						className="mt-2 w-full px-2 py-1 text-zinc-600"
 					/>
 				</article>
 			</PopoverContent>

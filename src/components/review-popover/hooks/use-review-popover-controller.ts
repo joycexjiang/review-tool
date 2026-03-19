@@ -44,6 +44,7 @@ export function useReviewPopoverController() {
 		toolbarSide,
 		toolbarWidth,
 		toolbarHeight,
+		toolbarX,
 		toolbarY,
 	} = useInspectorState();
 	const {
@@ -56,6 +57,7 @@ export function useReviewPopoverController() {
 		setDrawerWidth,
 		setDrawerResizing,
 		setToolbarSide,
+		setToolbarX,
 		setToolbarY,
 	} = useInspectorActions();
 	const panelOpen = isPanelOpen(reviewPopover);
@@ -71,8 +73,10 @@ export function useReviewPopoverController() {
 		() => groupNotesBySeveritySection(sortedNotes),
 		[sortedNotes],
 	);
-	const { showHighlight: showKeyboardHighlight, clearHighlight: clearKeyboardHighlight } =
-		useElementHighlightOverlay();
+	const {
+		showHighlight: showKeyboardHighlight,
+		clearHighlight: clearKeyboardHighlight,
+	} = useElementHighlightOverlay();
 
 	const onKeyboardFocusChange = useCallback(
 		(note: NoteView | null) => {
@@ -91,7 +95,12 @@ export function useReviewPopoverController() {
 				clearKeyboardHighlight();
 			}
 		},
-		[clearHighlightedNote, setActiveNote, showKeyboardHighlight, clearKeyboardHighlight],
+		[
+			clearHighlightedNote,
+			setActiveNote,
+			showKeyboardHighlight,
+			clearKeyboardHighlight,
+		],
 	);
 
 	const keyboardNavResetKey = `${activeDeploy}:${filters.type ?? "all"}`;
@@ -151,15 +160,17 @@ export function useReviewPopoverController() {
 		handlePointerMove,
 		handlePointerUp,
 		isDrawerMode,
-		isLeft,
+		panelSide,
 		positionStyle,
 	} = useReviewPopoverLayout({
 		panelMode,
 		setToolbarSide,
+		setToolbarX,
 		setToolbarY,
 		toolbarHeight,
 		toolbarSide,
 		toolbarWidth,
+		toolbarX,
 		toolbarY,
 	});
 
@@ -178,12 +189,7 @@ export function useReviewPopoverController() {
 			toggleResolve,
 		}),
 
-		[
-			closePanel,
-			copyAll,
-			togglePanelMode,
-			toggleResolve,
-		],
+		[closePanel, copyAll, togglePanelMode, toggleResolve],
 	);
 
 	const data = useMemo<ReviewPopoverDataValue>(
@@ -197,7 +203,6 @@ export function useReviewPopoverController() {
 			listRef,
 			sections,
 			stats,
-			unresolvedCount: unresolvedNotes.length,
 		}),
 		[
 			deployNotes,
@@ -208,7 +213,6 @@ export function useReviewPopoverController() {
 			isFilteredEmpty,
 			sections,
 			stats,
-			unresolvedNotes.length,
 		],
 	);
 
@@ -230,8 +234,9 @@ export function useReviewPopoverController() {
 			floatingWidth: floating.width,
 			isDragging: positionStyle.cursor === "grabbing",
 			isDrawerMode,
-			isLeft,
+			isLeft: panelSide === "left",
 			panelOpen,
+			panelSide,
 			onDrawerResize: (_event, _direction, resizedElement) => {
 				setDrawerWidth(resizedElement.getBoundingClientRect().width);
 			},
@@ -263,7 +268,7 @@ export function useReviewPopoverController() {
 			handlePointerMove,
 			handlePointerUp,
 			isDrawerMode,
-			isLeft,
+			panelSide,
 			panelOpen,
 			positionStyle,
 			setDrawerResizing,

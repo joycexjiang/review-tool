@@ -9,7 +9,7 @@ import ReviewPopoverToggleButton from "./review-popover-toggle-button";
 export default function ToolbarContent() {
 	const { toolbarSide, isDrawerOpen } = useToolbarLayoutContext();
 	const isVertical =
-		!isDrawerOpen && (toolbarSide === "left" || toolbarSide === "right");
+		isDrawerOpen || toolbarSide === "left" || toolbarSide === "right";
 
 	return (
 		<>

@@ -15,6 +15,7 @@ import { useToolbarLayout } from "./use-toolbar-layout";
 
 export function useToolbarController() {
 	const {
+		drawerWidth,
 		inspection,
 		reviewPopover,
 		toolbarHeight,
@@ -37,6 +38,7 @@ export function useToolbarController() {
 	const panelMode = getPanelMode(reviewPopover);
 	const panelOpen = isPanelOpen(reviewPopover);
 	const layout = useToolbarLayout({
+		drawerWidth,
 		panelMode,
 		panelOpen,
 		setToolbarHeight,

@@ -45,7 +45,7 @@ export default function ReviewPopoverList() {
 	let itemIndex = 0;
 
 	return (
-		<div ref={listRef} className="relative flex-1 overflow-y-auto pb-2">
+		<div ref={listRef} className="relative flex-1 overflow-y-auto scroll-py-3 pb-2">
 			{deployNotes.length === 0 ? (
 				<EmptyReviewState />
 			) : isFilteredEmpty ? (
